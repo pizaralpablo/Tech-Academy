@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gengar Bravo Points</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Inter,Arial,sans-serif;color:#fff;user-select:none;background:
+radial-gradient(circle at 50% 47%,#422267 0,#1d102f 32%,#09060e 72%);display:grid;place-items:center}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:
+radial-gradient(circle at 50% 50%,transparent 0 25%,#0008 85%),
+repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 4px)}
+.score{position:fixed;top:26px;right:30px;z-index:20;padding:13px 19px;border:1px solid #ffffff24;
+border-radius:999px;background:#09060e99;backdrop-filter:blur(12px);font-size:13px;font-weight:900;letter-spacing:.06em}
+.stage{width:min(900px,95vw);height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.title{position:absolute;top:8vh;margin:0;font-size:clamp(30px,5vw,58px);letter-spacing:-.055em}
+.title span{color:#b58aff}.subtitle{position:absolute;top:calc(8vh + 70px);font-size:10px;letter-spacing:.32em;color:#aa99ba}
+.gengar-btn{position:relative;border:0;background:none;padding:0;cursor:pointer;width:min(390px,70vw);display:block;
+filter:drop-shadow(0 30px 28px #000b) drop-shadow(0 0 45px #8b44d94a);transition:filter .2s}
+.gengar-btn:hover{filter:drop-shadow(0 35px 30px #000c) drop-shadow(0 0 70px #a45cff77)}
+.gengar{width:100%;height:auto;display:block;transform-origin:50% 70%;animation:float 3s ease-in-out infinite}
+.gengar-btn:active .gengar{transform:scale(.91)}
+.shadow{width:290px;height:38px;border-radius:50%;background:#0008;filter:blur(12px);margin-top:-13px}
+.hint{position:absolute;bottom:7vh;font-size:10px;letter-spacing:.24em;color:#9e8aaa}
+.coin{position:fixed;left:0;top:0;width:70px;height:70px;border-radius:50%;z-index:50;pointer-events:none;
+display:grid;place-items:center;text-align:center;color:#5d3b00;font-size:8px;font-weight:1000;line-height:1.05;
+background:radial-gradient(circle at 32% 25%,#fff9bf,#ffd94f 25%,#e99b08 62%,#925400);
+border:4px solid #ffdf64;box-shadow:inset 0 0 0 3px #a96600,0 0 26px #ffc72d99;
+animation:fly 1.25s cubic-bezier(.16,.75,.25,1) forwards}
+.coin:before{content:"★";position:absolute;font-size:42px;color:#fff4a366;z-index:-1}
+.plus{position:fixed;z-index:60;pointer-events:none;font-weight:1000;color:#ffe46f;text-shadow:0 3px 10px #000;
+animation:plus .9s forwards}
+.bonk{animation:bonk .28s!important}
+@keyframes float{50%{transform:translateY(-13px) rotate(-1deg)}}
+@keyframes bonk{0%{transform:scale(1)}35%{transform:scale(.88,.94) rotate(-3deg)}70%{transform:scale(1.08,.96) rotate(2deg)}100%{transform:scale(1)}}
+@keyframes fly{0%{transform:translate(-50%,-50%) scale(.25) rotateY(0);opacity:0}10%{opacity:1}
+45%{transform:translate(calc(-50% + var(--dx)),calc(-50% - 170px)) scale(1.15) rotateY(540deg)}
+100%{transform:translate(calc(-50% + var(--dx2)),calc(-50% + 120px)) scale(.55) rotateY(1080deg);opacity:0}}
+@keyframes plus{0%{transform:translate(-50%,0) scale(.5);opacity:0}15%{opacity:1}100%{transform:translate(-50%,-105px) scale(1.25);opacity:0}}
+@media(max-width:600px){.score{top:15px;right:15px}.title{top:10vh}.subtitle{top:calc(10vh + 50px)}.gengar-btn{width:70vw}}
+</style></head>
+<body>
+<div class="score">🪙 <span id="score">0</span> BRAVO POINTS</div>
+<main class="stage">
+<h1 class="title">GENGAR <span>REWARDS</span></h1>
+<div class="subtitle">EQUIFAX // BRAVO POINT DISPENSER</div>
+<button class="gengar-btn" id="gengar" aria-label="Generar Bravo Point">
+<img class="gengar" id="gengarImg" src="gengar.png" alt="Gengar">
+</button>
+<div class="shadow"></div>
+<div class="hint">CLICK GENGAR · RECEIVE CORPORATE APPRECIATION</div>
+</main>
+<script>
+let score=0;
+const btn=document.querySelector('#gengar'), img=document.querySelector('#gengarImg'), counter=document.querySelector('#score');
+btn.addEventListener('click',e=>{
+ counter.textContent=++score;
+ img.classList.remove('bonk'); void img.offsetWidth; img.classList.add('bonk');
+ const r=img.getBoundingClientRect(), x=r.left+r.width*.5, y=r.top+r.height*.52;
+ const coin=document.createElement('div'); coin.className='coin'; coin.innerHTML='BRAVO<br>POINT';
+ coin.style.left=x+'px'; coin.style.top=y+'px';
+ coin.style.setProperty('--dx',(Math.random()*180-90)+'px');
+ coin.style.setProperty('--dx2',(Math.random()*330-165)+'px');
+ document.body.appendChild(coin);
+ const plus=document.createElement('div'); plus.className='plus'; plus.textContent='+1 BRAVO';
+ plus.style.left=e.clientX+'px'; plus.style.top=e.clientY+'px'; document.body.appendChild(plus);
+ setTimeout(()=>{coin.remove();plus.remove()},1400);
+});
+</script></body></html>
