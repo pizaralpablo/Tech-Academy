@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Hola Bravo Points: mi primera página web servida desde un contenedor Docker con Nginx."
+      content="A Docker homework project deploying a custom Nginx web server."
     />
-    <title>Hola Bravo Points | Docker</title>
+    <title>Luis O | My Docker Homework</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,45 +17,73 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="page-shell" id="inicio">
-      <nav class="navbar" aria-label="Navegación principal">
-        <a class="brand" href="#inicio" aria-label="Inicio de Hola Bravo Points">
+    <main class="page-shell">
+      <nav class="navbar" aria-label="Main navigation">
+        <a class="brand" href="#top" aria-label="Luis O. Docker Homework home">
           <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 32 32" fill="none">
               <path d="M5 15.5h5v-5h5v5h5v-5h5v5h2.2c1.2 0 2.2-.9 2.2-2.1V11h-2.7v2h-2v-2h-5v2h-2v-2h-5v2h-2v-2H5v4.5Z" fill="currentColor" />
               <path d="M5 18.5h22c-1 4.8-4.9 7.5-10.5 7.5C10.2 26 6.2 23.4 5 18.5Z" fill="currentColor" opacity=".75" />
             </svg>
           </span>
-          Hola Bravo Points <span>/ Docker</span>
+          Luis O<span> / docker homework</span>
         </a>
-        <span class="server-status"><i></i> Contenedor activo</span>
+        <span class="server-status"><i></i> My first container is live</span>
       </nav>
 
-      <section class="hero">
+      <section class="hero" id="top">
         <div class="hero-copy">
-          <p class="eyebrow"><span></span> Tech Academy · Docker</p>
-          <h1>¡Hola <em>Bravo Points!</em></h1>
+          <p class="eyebrow"><span></span> Luis O · first Docker homework</p>
+          <h1>I built and deployed my first <em>container.</em></h1>
+          <p class="intro">
+            This page is part of my Docker homework: learning how to build an image, containerise a web server, and deploy a custom Nginx site.
+          </p>
+          <div class="actions">
+            <a class="button button-primary" href="#stack">See what I learned <span aria-hidden="true">↓</span></a>
+          </div>
         </div>
 
-        <div class="visual-card">
-          <div class="visual-label">
-            <span></span><span></span><span></span>
-            <p>hola-bravo-points — nginx</p>
-          </div>
-          <img
-            src="https://cdnb.artstation.com/p/assets/images/images/031/016/295/original/reecion-farminggame.gif?1602336749"
-            alt="Escena animada de una granja para Hola Bravo Points"
-          />
-          <div class="command-line">
-            <b>$</b> docker run -p 8080:80 hola-bravo-points
-            <strong>HTTP 200 · ONLINE</strong>
+        <div class="terminal-card" aria-label="Deployment terminal output">
+          <div class="terminal-top"><span></span><span></span><span></span><p>luis-o — docker homework</p></div>
+          <div class="terminal-body">
+            <p><b>$</b> docker run -d nginx-homework</p>
+            <p class="muted">[+] Running 1/1</p>
+            <p class="success"> ✔ Container luis-nginx&nbsp; Started</p>
+            <br />
+            <p><b>$</b> curl localhost</p>
+            <p class="response">HTTP/1.1 200 OK</p>
+            <p class="cursor">_</p>
           </div>
         </div>
       </section>
 
-      <footer>
-        <p>Hola Bravo Points · Tech Academy</p>
-        <p>HTML <span>•</span> CSS <span>•</span> NGINX <span>•</span> DOCKER</p>
+      <section class="stack" id="stack" aria-labelledby="stack-heading">
+        <div class="section-heading">
+          <p class="eyebrow"><span></span> What I practised</p>
+          <h2 id="stack-heading">The first steps of my container journey.</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-icon icon-blue">▣</span>
+            <h3>Built an image</h3>
+            <p>I used a Dockerfile to package this custom HTML and CSS page into a reusable Nginx image.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-orange">⌘</span>
+            <h3>Containerised Nginx</h3>
+            <p>I replaced the default Nginx welcome screen with my own page and ran it inside a container.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon icon-lime">↗</span>
+            <h3>Deployed locally</h3>
+            <p>I exposed the server to my browser, turning a local image into a working web experience.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer id="about">
+        <p>Luis O · Docker Homework</p>
+        <p>MY FIRST IMAGE <span>•</span> NGINX</p>
       </footer>
     </main>
   </body>
