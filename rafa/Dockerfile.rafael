@@ -1,0 +1,19 @@
+# Usa Nginx sobre Alpine como imagen base
+FROM nginx:1.27-alpine
+
+# Elimina la pagina predeterminada de Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copia nuestra pagina web al directorio publico de Nginx
+COPY index.html /usr/share/nginx/html/index.html
+
+# Documenta que Nginx escucha en el puerto 80
+EXPOSE 80
+
+# Inicia Nginx en primer plano cuando arranca el contenedor
+CMD ["nginx", "-g", "daemon off;"]
+
+# El Dockerfile dice:
+# Parta de una imagen que ya trae Nginx → quite la página predeterminada → 
+# meta mi index.html donde Nginx sirve contenido → documente que usamos el puerto 80 →
+# y cuando arranque el container, mantenga Nginx ejecutándose.
