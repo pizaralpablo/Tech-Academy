@@ -1,0 +1,11 @@
+# Imagen base ligera de Nginx
+FROM nginx:alpine
+
+# Copiamos nuestro index.html personalizado a la carpeta que sirve Nginx por defecto
+COPY index.html /usr/share/nginx/html/index.html
+
+# Puerto por defecto en el que escucha Nginx
+EXPOSE 80
+
+# Comando por defecto de la imagen base (Nginx en primer plano)
+CMD ["nginx", "-g", "daemon off;"]
