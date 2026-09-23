@@ -688,7 +688,7 @@ kubectl top pods -n demo
 </code></pre>
 <p>Para logs:</p>
 <pre><code>
-kubectl logs -n demo -l app=agent --tail=50
+kubectl logs -n demo -l app=node-agent --tail=50
 </code></pre>
 <p>Grafana sola no almacena logs. Necesita una fuente como Loki, Prometheus o Elasticsearch.</p>
 <p>---</p>
