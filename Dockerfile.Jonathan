@@ -1,11 +1,21 @@
-# Imagen base ligera de Nginx
-FROM nginx:alpine
+# Imagen base ligera de Node.js
+FROM node:20-alpine
 
-# Copiamos nuestro index.html personalizado a la carpeta que sirve Nginx por defecto
-COPY index.html /usr/share/nginx/html/index.html
+# Directorio de trabajo dentro del contenedor
+WORKDIR /app
 
-# Puerto por defecto en el que escucha Nginx
-EXPOSE 80
+# Copiamos primero los manifiestos para aprovechar la cache de capas de Docker
+COPY package.json ./
 
-# Comando por defecto de la imagen base (Nginx en primer plano)
-CMD ["nginx", "-g", "daemon off;"]
+# Instalamos las dependencias (Express)
+RUN npm install --omit=dev
+
+# Copiamos el resto del código de la aplicación (servidor + página estática)
+COPY server.js ./
+COPY public ./public
+
+# Puerto en el que escucha nuestro servidor Express
+EXPOSE 3000
+
+# Arrancamos el servidor Node.js
+CMD ["node", "server.js"]
