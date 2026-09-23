@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jonathan-web
+  labels:
+    app: jonathan-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jonathan-web
+  template:
+    metadata:
+      labels:
+        app: jonathan-web
+    spec:
+      containers:
+        - name: jonathan-web
+          image: jonathan-web:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
