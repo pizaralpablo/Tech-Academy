@@ -1,0 +1,841 @@
+﻿<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Curso de Docker y Kubernetes</title><style>body{margin:0;background:#eef3f1;color:#19313d;font:16px/1.65 Segoe UI,sans-serif}main{max-width:980px;margin:auto;background:#fff;padding:48px 64px;box-shadow:0 0 30px #19313d22}h1{font:700 3em Georgia;color:#0d5c63;border-bottom:6px solid #ed7d5a;padding-bottom:20px}h2{margin-top:48px;color:#0d5c63;border-bottom:2px solid #d7e8e5;padding-bottom:8px}h3{color:#b5543d}blockquote{border-left:5px solid #ed7d5a;background:#fff3ee;padding:12px 20px}pre{background:#17252d;color:#e9f3ef;padding:18px;border-radius:6px;overflow:auto;line-height:1.45}code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;margin:20px 0}th{background:#0d5c63;color:#fff;text-align:left}td,th{padding:10px;border:1px solid #c8ddda}li{margin:5px 0}@media print{body{background:#fff}main{box-shadow:none;padding:20px}h2{break-before:page}pre{white-space:pre-wrap}}</style></head><body><main>
+<h1>Curso practico de Docker y Kubernetes</h1>
+<h2>1. Docker desde cero</h2>
+<h3>Comprobar Docker</h3>
+<pre><code>
+docker version
+</code></pre>
+<p>Muestra la version del cliente y del servidor Docker.</p>
+<pre><code>
+docker info
+</code></pre>
+<p>Muestra el runtime, almacenamiento, registros y contenedores configurados.</p>
+<h3>Descargar una imagen</h3>
+<pre><code>
+docker pull nginx:1.27-alpine
+</code></pre>
+<ul>
+<li>`docker pull`: descarga una imagen.</li>
+<li>`nginx`: nombre del repositorio.</li>
+<li>`1.27-alpine`: etiqueta de version y variante.</li>
+</ul>
+<h3>Ejecutar un contenedor</h3>
+<pre><code>
+docker run --name web-demo -d -p 8080:80 nginx:1.27-alpine
+</code></pre>
+<ul>
+<li>`run`: crea y arranca un contenedor.</li>
+<li>`--name web-demo`: asigna un nombre legible.</li>
+<li>`-d`: lo deja en segundo plano.</li>
+<li>`-p 8080:80`: conecta el puerto 8080 del equipo con el puerto 80 del contenedor.</li>
+<li>`nginx:1.27-alpine`: imagen usada.</li>
+</ul>
+<p>Abrir:</p>
+<pre><code>
+http://localhost:8080
+</code></pre>
+<h3>Inspeccionar contenedores</h3>
+<pre><code>
+docker ps
+</code></pre>
+<p>Lista contenedores activos.</p>
+<pre><code>
+docker ps -a
+</code></pre>
+<p>Lista activos y detenidos.</p>
+<pre><code>
+docker logs web-demo
+</code></pre>
+<p>Muestra la salida del proceso.</p>
+<pre><code>
+docker logs -f web-demo
+</code></pre>
+<p>Sigue los logs en tiempo real.</p>
+<pre><code>
+docker exec -it web-demo sh
+</code></pre>
+<p>Abre una terminal dentro del contenedor. En Alpine normalmente se usa <code>sh</code>, no <code>bash</code>.</p>
+<pre><code>
+docker inspect web-demo
+</code></pre>
+<p>Muestra configuracion detallada, red, volumenes e identificadores.</p>
+<pre><code>
+docker stop web-demo
+docker rm web-demo
+</code></pre>
+<p>Detiene y elimina el contenedor.</p>
+<h3>Imagenes locales</h3>
+<pre><code>
+docker images
+</code></pre>
+<p>Lista imagenes locales.</p>
+<pre><code>
+docker rmi nginx:1.27-alpine
+</code></pre>
+<p>Elimina una imagen que no este siendo usada.</p>
+<pre><code>
+docker image prune
+</code></pre>
+<p>Elimina imagenes no utilizadas.</p>
+<p>---</p>
+<h2>2. Dockerfile y multistage</h2>
+<p>Un Dockerfile es un archivo de instrucciones para construir una imagen.</p>
+<h3>Dockerfile basico</h3>
+<pre><code>
+# Usa Node sobre Alpine como imagen base.
+FROM node:22-alpine
+
+# Define la carpeta de trabajo.
+WORKDIR /app
+
+# Copia la declaracion de dependencias primero.
+COPY package*.json ./
+
+# Instala dependencias de produccion.
+RUN npm ci --omit=dev
+
+# Copia el codigo de la aplicacion.
+COPY . .
+
+# Documenta el puerto de la aplicacion.
+EXPOSE 8080
+
+# Comando ejecutado al iniciar el contenedor.
+CMD [&quot;node&quot;, &quot;server.js&quot;]
+</code></pre>
+<h3>Explicacion linea por linea</h3>
+<ul>
+<li>`FROM`: selecciona una imagen base.</li>
+<li>`WORKDIR`: fija el directorio actual de las siguientes instrucciones.</li>
+<li>`COPY`: copia archivos desde el contexto de construccion.</li>
+<li>`RUN`: ejecuta una orden durante la construccion.</li>
+<li>`EXPOSE`: documenta el puerto; no lo publica por si solo.</li>
+<li>`CMD`: define el proceso principal del contenedor.</li>
+</ul>
+<h3>Construir una imagen</h3>
+<pre><code>
+docker build -t demo-web:1.0 .
+</code></pre>
+<ul>
+<li>`build`: construye una imagen.</li>
+<li>`-t demo-web:1.0`: asigna nombre y etiqueta.</li>
+<li>`.`: usa la carpeta actual como contexto.</li>
+</ul>
+<h3>Multistage build</h3>
+<p>Permite usar una imagen grande para compilar y una imagen final mas pequena para ejecutar.</p>
+<pre><code>
+# Etapa de compilacion.
+FROM node:22-alpine AS build
+
+# Carpeta de trabajo de la compilacion.
+WORKDIR /app
+
+# Copia las dependencias.
+COPY package*.json ./
+
+# Instala y compila la aplicacion.
+RUN npm ci &amp;&amp; npm run build
+
+# Copia el codigo fuente.
+COPY . .
+
+# Compila la aplicacion.
+RUN npm run build
+
+# Etapa final de ejecucion.
+FROM nginx:1.27-alpine AS runtime
+
+# Elimina el contenido estatico predeterminado.
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copia solo el resultado compilado.
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Documenta el puerto HTTP.
+EXPOSE 80
+
+# Ejecuta Nginx en primer plano.
+CMD [&quot;nginx&quot;, &quot;-g&quot;, &quot;daemon off;&quot;]
+</code></pre>
+<h2>3. Redes y volumenes en Docker</h2>
+<p>Una red Docker permite que los contenedores se encuentren por nombre.</p>
+<pre><code>
+docker network create demo-net
+docker run -d --name db --network demo-net postgres:16-alpine
+docker run -d --name api --network demo-net demo-api:1.0
+</code></pre>
+<p>Dentro de <code>api</code>, el hostname de la base es <code>db</code>, no <code>localhost</code>.</p>
+<p>Los volumenes conservan datos fuera del ciclo de vida del contenedor:</p>
+<pre><code>
+docker volume create db-data
+docker run -d --name db -v db-data:/var/lib/postgresql/data postgres:16-alpine
+</code></pre>
+<h2>4. Que es Kubernetes</h2>
+<p>Kubernetes automatiza el despliegue, escalado, red, recuperacion y configuracion de contenedores.</p>
+<ul>
+<li>**API Server:** recibe las operaciones del cluster.</li>
+<li>**Scheduler:** decide en que nodo colocar cada Pod.</li>
+<li>**Controller Manager:** corrige diferencias entre estado deseado y actual.</li>
+<li>**etcd:** almacena el estado de Kubernetes.</li>
+<li>**Kubelet:** ejecuta instrucciones en cada nodo.</li>
+<li>**kube-proxy:** mantiene las reglas de red que permiten que los Services dirijan trafico hacia los Pods correctos.</li>
+</ul>
+<p><code>kube-proxy</code> normalmente se ejecuta como un DaemonSet del sistema, uno por nodo. Observa los Services y sus endpoints, y configura reglas de red usando mecanismos como iptables o IPVS. No es un proxy HTTP tradicional; trabaja principalmente en la capa de red de los Services.</p>
+<h2>5. Instalar un laboratorio local</h2>
+<pre><code>
+minikube start --driver=docker
+minikube status
+kubectl get nodes
+</code></pre>
+<p>Resultado esperado: el nodo aparece con estado <code>Ready</code>.</p>
+<pre><code>
+minikube addons enable ingress
+minikube addons enable metrics-server
+</code></pre>
+<p>---</p>
+<h2>6. Namespaces</h2>
+<p>Un namespace separa recursos dentro del mismo cluster. Sirve para organizar equipos, ambientes o aplicaciones.</p>
+<pre><code>
+apiVersion: v1 # Version de la API principal.
+kind: Namespace # Declara un namespace.
+metadata: # Metadatos del recurso.
+  name: demo # Nombre del namespace.
+</code></pre>
+<p>Aplicar:</p>
+<pre><code>
+kubectl apply -f namespace.yaml
+kubectl get namespaces
+</code></pre>
+<p>Consultar recursos:</p>
+<pre><code>
+kubectl get pods -n demo
+kubectl get all -n demo
+</code></pre>
+<p>Un namespace no es una frontera de seguridad completa. Para seguridad se combinan RBAC, NetworkPolicies, Secrets y controles de admision.</p>
+<p>---</p>
+<h2>7. Pods y controladores</h2>
+<h3>Pod</h3>
+<p>Un Pod es la unidad minima desplegable de Kubernetes. Normalmente contiene un contenedor, aunque puede tener varios contenedores estrechamente relacionados.</p>
+<pre><code>
+apiVersion: v1 # Version de la API para Pods.
+kind: Pod # Declara un Pod directo.
+metadata: # Identidad y etiquetas.
+  name: web-pod # Nombre del Pod.
+  namespace: demo # Namespace del Pod.
+  labels: # Etiquetas para seleccionarlo.
+    app: web # Etiqueta de aplicacion.
+spec: # Estado deseado.
+  containers: # Lista de contenedores.
+    - name: web # Nombre del contenedor.
+      image: nginx:1.27-alpine # Imagen a ejecutar.
+      ports: # Puertos declarados.
+        - name: http # Nombre del puerto.
+          containerPort: 80 # Puerto dentro del contenedor.
+</code></pre>
+<p>Un Pod directo no es ideal para aplicaciones normales porque no ofrece actualizaciones progresivas ni replicas administradas. Para eso se usan controladores.</p>
+<h3>Deployment</h3>
+<p>Usalo para aplicaciones stateless como APIs y frontends.</p>
+<pre><code>
+apiVersion: apps/v1 # API de Deployments.
+kind: Deployment # Controlador de replicas y actualizaciones.
+metadata: # Identidad del recurso.
+  name: web # Nombre del Deployment.
+  namespace: demo # Namespace objetivo.
+spec: # Estado deseado.
+  replicas: 3 # Mantiene tres Pods.
+  selector: # Selecciona los Pods administrados.
+    matchLabels: # Regla de seleccion.
+      app: web # Debe coincidir con la plantilla.
+  template: # Plantilla de cada Pod.
+    metadata: # Metadatos del Pod.
+      labels: # Etiquetas del Pod.
+        app: web # Etiqueta usada por el selector.
+    spec: # Configuracion del Pod.
+      containers: # Contenedores del Pod.
+        - name: web # Nombre del contenedor.
+          image: nginx:1.27-alpine # Imagen de la aplicacion.
+          ports: # Puertos del contenedor.
+            - containerPort: 80 # Puerto HTTP.
+</code></pre>
+<p>Kubernetes crea un ReplicaSet y el ReplicaSet crea los Pods. Si un Pod muere, el controlador crea otro.</p>
+<pre><code>
+kubectl apply -f deployment.yaml
+kubectl get deployment,replicaset,pods -n demo
+kubectl scale deployment web --replicas=5 -n demo
+kubectl rollout status deployment/web -n demo
+kubectl rollout undo deployment/web -n demo
+</code></pre>
+<h3>StatefulSet</h3>
+<p>Usalo para bases de datos o sistemas que necesitan identidad estable, orden de arranque y volumen dedicado.</p>
+<pre><code>
+apiVersion: apps/v1 # API de StatefulSet.
+kind: StatefulSet # Controlador para aplicaciones con estado.
+metadata: # Identidad del recurso.
+  name: database # Nombre del StatefulSet.
+  namespace: demo # Namespace objetivo.
+spec: # Estado deseado.
+  serviceName: database # Service headless asociado.
+  replicas: 1 # Numero de instancias.
+  selector: # Seleccion de Pods.
+    matchLabels: # Coincidencia de etiquetas.
+      app: database # Etiqueta esperada.
+  template: # Plantilla de Pod.
+    metadata: # Metadatos.
+      labels: # Etiquetas del Pod.
+        app: database # Identifica la base.
+    spec: # Configuracion del Pod.
+      containers: # Contenedores.
+        - name: database # Nombre del contenedor.
+          image: postgres:16-alpine # Imagen PostgreSQL.
+          ports: # Puertos.
+            - name: postgres # Nombre del puerto.
+              containerPort: 5432 # Puerto PostgreSQL.
+          volumeMounts: # Montajes.
+            - name: data # Nombre del volumen.
+              mountPath: /var/lib/postgresql/data # Carpeta de datos.
+  volumeClaimTemplates: # Crea un PVC por replica.
+    - metadata: # Identidad del PVC generado.
+        name: data # Nombre del volumen.
+      spec: # Solicitud de almacenamiento.
+        accessModes: [&quot;ReadWriteOnce&quot;] # Escritura desde un nodo.
+        resources: # Recursos de almacenamiento.
+          requests: # Minimo solicitado.
+            storage: 10Gi # Diez GiB por instancia.
+</code></pre>
+<p>Un StatefulSet <strong>no convierte por si solo una base en HA</strong>. Para replicacion y failover se necesita PostgreSQL configurado para ello, un operador o una solucion especializada.</p>
+<h3>DaemonSet</h3>
+<p>Crea un Pod por nodo. Es apropiado para agentes de logs, monitoreo o networking.</p>
+<pre><code>
+apiVersion: apps/v1 # API de DaemonSet.
+kind: DaemonSet # Un Pod por nodo elegible.
+metadata: # Identidad.
+  name: node-agent # Nombre del agente.
+  namespace: demo # Namespace.
+spec: # Estado deseado.
+  selector: # Selector de Pods.
+    matchLabels: # Coincidencia.
+      app: node-agent # Etiqueta del agente.
+  template: # Plantilla.
+    metadata: # Metadatos.
+      labels: # Etiquetas.
+        app: node-agent # Etiqueta seleccionable.
+    spec: # Configuracion.
+      containers: # Contenedores.
+        - name: agent # Nombre del agente.
+          image: fluent/fluent-bit:3.2.10 # Imagen del agente.
+</code></pre>
+<p>Combinarlo con <code>nodeSelector</code>:</p>
+<pre><code>
+nodeSelector:
+  kubernetes.io/os: linux
+</code></pre>
+<p><code>nodeSelector</code> decide donde puede correr un Pod; <code>DaemonSet</code> decide cuantos Pods crear.</p>
+<h3>Job</h3>
+<p>Ejecuta una tarea hasta completarla.</p>
+<pre><code>
+apiVersion: batch/v1 # API de Jobs.
+kind: Job # Trabajo que termina.
+metadata: # Identidad.
+  name: migration # Nombre del trabajo.
+  namespace: demo # Namespace.
+spec: # Configuracion.
+  backoffLimit: 2 # Reintentos permitidos.
+  template: # Plantilla del Pod.
+    spec: # Configuracion del Pod.
+      restartPolicy: Never # El Job controla los reintentos.
+      containers: # Contenedores.
+        - name: task # Nombre.
+          image: alpine:3.20 # Imagen.
+          command: [&quot;sh&quot;, &quot;-c&quot;, &quot;echo migracion completa&quot;] # Tarea ejecutada.
+</code></pre>
+<h3>CronJob</h3>
+<p>Ejecuta Jobs usando una expresion cron.</p>
+<pre><code>
+apiVersion: batch/v1 # API de CronJob.
+kind: CronJob # Trabajo programado.
+metadata: # Identidad.
+  name: health-check # Nombre.
+  namespace: demo # Namespace.
+spec: # Configuracion.
+  schedule: &quot;*/5 * * * *&quot; # Cada cinco minutos.
+  concurrencyPolicy: Forbid # No permite solapamiento.
+  jobTemplate: # Plantilla de cada Job.
+    spec: # Configuracion del Job.
+      ttlSecondsAfterFinished: 300 # Borra Job y Pod cinco minutos despues.
+      template: # Plantilla del Pod.
+        spec: # Configuracion del Pod.
+          restartPolicy: Never # No reinicia el Pod directamente.
+          containers: # Contenedores.
+            - name: check # Nombre.
+              image: postgres:16-alpine # Imagen con herramientas de salud.
+              command: [&quot;sh&quot;, &quot;-c&quot;, &quot;pg_isready -h database&quot;] # Comprobacion.
+</code></pre>
+<p>---</p>
+<h2>8. Services</h2>
+<p>Los Pods son efimeros y sus IPs pueden cambiar. Un Service ofrece una direccion estable y balancea trafico entre Pods seleccionados.</p>
+<pre><code>
+apiVersion: v1 # API principal.
+kind: Service # Recurso de red estable.
+metadata: # Identidad.
+  name: web # Nombre DNS interno.
+  namespace: demo # Namespace.
+spec: # Configuracion de red.
+  type: ClusterIP # Solo accesible dentro del cluster.
+  selector: # Pods destino.
+    app: web # Debe coincidir con las etiquetas.
+  ports: # Puertos publicados.
+    - name: http # Nombre del puerto.
+      port: 80 # Puerto del Service.
+      targetPort: http # Puerto del Pod, por nombre.
+</code></pre>
+<p>DNS interno:</p>
+<pre><code>
+web.demo.svc.cluster.local
+</code></pre>
+<p>Dentro del mismo namespace normalmente basta:</p>
+<pre><code>
+web
+</code></pre>
+<h3>Tipos de Service</h3>
+<table><tr><td>Tipo</td><td>Uso</td></tr></table>
+<table><tr><td>`ClusterIP`</td><td>Acceso interno, valor por defecto</td></tr></table>
+<table><tr><td>`NodePort`</td><td>Publica un puerto en cada nodo</td></tr></table>
+<table><tr><td>`LoadBalancer`</td><td>Solicita un balanceador externo</td></tr></table>
+<table><tr><td>`ExternalName`</td><td>Alias DNS hacia un servicio externo</td></tr></table>
+<p>Ejemplos:</p>
+<pre><code>
+kubectl get service -n demo
+kubectl get endpoints -n demo
+kubectl describe service web -n demo
+</code></pre>
+<p>Un Service selecciona por etiquetas, no por nombre del Deployment.</p>
+<p>---</p>
+<h2>9. Ingress y TLS</h2>
+<p>Un Ingress enruta HTTP/HTTPS hacia Services internos. Necesita un <strong>Ingress Controller</strong>, por ejemplo Nginx.</p>
+<pre><code>
+minikube addons enable ingress
+</code></pre>
+<h3>Ingress HTTP</h3>
+<pre><code>
+apiVersion: networking.k8s.io/v1 # API de Ingress.
+kind: Ingress # Reglas HTTP/HTTPS.
+metadata: # Identidad y anotaciones.
+  name: web # Nombre del Ingress.
+  namespace: demo # Namespace.
+spec: # Reglas deseadas.
+  ingressClassName: nginx # Controlador que procesara el recurso.
+  rules: # Reglas por hostname.
+    - host: app.example.test # Dominio recibido en la peticion.
+      http: # Configuracion HTTP.
+        paths: # Rutas.
+          - path: / # Ruta principal.
+            pathType: Prefix # Coincide con subrutas.
+            backend: # Destino.
+              service: # Service backend.
+                name: web # Service de la aplicacion.
+                port: # Puerto del Service.
+                  number: 80 # Puerto HTTP.
+</code></pre>
+<p>El flujo es:</p>
+<pre><code>
+Cliente -&gt; Ingress Controller -&gt; Ingress rule -&gt; Service -&gt; Pods
+</code></pre>
+<h3>TLS con Secret</h3>
+<p>Crear un certificado local:</p>
+<pre><code>
+kubectl create secret tls web-tls `
+  --cert=.\tls\tls.crt `
+  --key=.\tls\tls.key `
+  -n demo
+</code></pre>
+<p>Ingress HTTPS:</p>
+<pre><code>
+spec: # Configuracion del Ingress.
+  ingressClassName: nginx # Controlador Nginx.
+  tls: # Lista de configuraciones TLS.
+    - hosts: # Hostnames cubiertos.
+        - app.example.test # Nombre incluido en el certificado.
+      secretName: web-tls # Secret con tls.crt y tls.key.
+  rules: # Reglas HTTP que seran servidas sobre TLS.
+    - host: app.example.test # Hostname de la aplicacion.
+      http: # Enrutamiento HTTP interno del Ingress.
+        paths: # Rutas.
+          - path: / # Ruta principal.
+            pathType: Prefix # Incluye subrutas.
+            backend: # Destino.
+              service: # Service backend.
+                name: web # Nombre del Service.
+                port: # Puerto del Service.
+                  number: 80 # Puerto web.
+</code></pre>
+<p>Para forzar redireccion:</p>
+<pre><code>
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: &quot;true&quot;
+</code></pre>
+<p>En produccion se recomienda <code>cert-manager</code> y una autoridad certificadora confiable. Un certificado autofirmado cifra la conexion, pero genera una advertencia en el navegador.</p>
+<p>---</p>
+<h2>10. ConfigMaps y Secrets</h2>
+<h3>ConfigMap</h3>
+<p>Guarda configuracion no sensible.</p>
+<pre><code>
+apiVersion: v1 # API principal.
+kind: ConfigMap # Recurso de configuracion.
+metadata: # Identidad.
+  name: app-config # Nombre.
+  namespace: demo # Namespace.
+data: # Pares de configuracion.
+  APP_MODE: production # Valor de texto.
+  LOG_LEVEL: info # Nivel de logs.
+</code></pre>
+<p>Usarlo como variables:</p>
+<pre><code>
+envFrom:
+  - configMapRef:
+      name: app-config
+</code></pre>
+<p>Usarlo como archivo:</p>
+<pre><code>
+volumes:
+  - name: config
+    configMap:
+      name: app-config
+</code></pre>
+<h3>Secret</h3>
+<p>Guarda datos sensibles, pero por defecto Kubernetes los almacena codificados en Base64, no cifrados automaticamente.</p>
+<pre><code>
+apiVersion: v1 # API principal.
+kind: Secret # Recurso de datos sensibles.
+metadata: # Identidad.
+  name: db-credentials # Nombre.
+  namespace: demo # Namespace.
+type: Opaque # Tipo generico.
+stringData: # Kubernetes codifica estos valores al guardar el Secret.
+  DB_USER: appuser # Usuario.
+  DB_PASSWORD: change-me # Password de ejemplo.
+</code></pre>
+<p>Inyectar una clave concreta:</p>
+<pre><code>
+env:
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: db-credentials
+        key: DB_PASSWORD
+</code></pre>
+<p>Buenas practicas:</p>
+<ul>
+<li>No guardar passwords reales en Git.</li>
+<li>Usar un gestor externo de secretos en produccion.</li>
+<li>Limitar acceso con RBAC.</li>
+<li>Rotar credenciales.</li>
+<li>Evitar imprimir Secrets en logs.</li>
+</ul>
+<p>---</p>
+<h2>11. Requests, limits y ResourceQuota</h2>
+<h3>Requests y limits</h3>
+<pre><code>
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+</code></pre>
+<ul>
+<li>`requests`: recursos usados por el scheduler para colocar el Pod y garantizados como reserva.</li>
+<li>`limits`: techo de consumo del contenedor.</li>
+<li>`100m`: 100 millicores, aproximadamente una decima de CPU.</li>
+<li>`Mi`: mebibytes.</li>
+</ul>
+<p>Un Pod sin recursos puede ser rechazado cuando existe una cuota que los exige.</p>
+<h3>ResourceQuota</h3>
+<pre><code>
+apiVersion: v1 # API principal.
+kind: ResourceQuota # Limita el consumo de un namespace.
+metadata: # Identidad.
+  name: demo-quota # Nombre.
+  namespace: demo # Namespace controlado.
+spec: # Limites.
+  hard: # Valores maximos.
+    pods: &quot;20&quot; # Maximo de Pods.
+    services: &quot;10&quot; # Maximo de Services.
+    persistentvolumeclaims: &quot;10&quot; # Maximo de PVCs.
+    requests.cpu: &quot;4&quot; # CPU total solicitada.
+    requests.memory: 8Gi # Memoria total solicitada.
+    limits.cpu: &quot;8&quot; # CPU total maxima.
+    limits.memory: 16Gi # Memoria total maxima.
+</code></pre>
+<p>Consultar:</p>
+<pre><code>
+kubectl get resourcequota -n demo
+kubectl describe resourcequota demo-quota -n demo
+</code></pre>
+<p>Si aparece <code>must specify limits.cpu</code>, el Pod necesita definir <code>requests</code> y <code>limits</code>.</p>
+<p>---</p>
+<h2>12. StorageClass, PV y PVC</h2>
+<h3>Las tres piezas</h3>
+<ul>
+<li>**StorageClass:** describe como aprovisionar almacenamiento.</li>
+<li>**PersistentVolume (PV):** almacenamiento disponible.</li>
+<li>**PersistentVolumeClaim (PVC):** solicitud hecha por una aplicacion.</li>
+</ul>
+<pre><code>
+flowchart LR
+    Pod --&gt; PVC[PersistentVolumeClaim]
+    PVC --&gt; PV[PersistentVolume]
+    PV --&gt; SC[StorageClass o provisionador]
+    PV --&gt; Disk[Disco / hostPath / cloud disk]
+</code></pre>
+<h3>StorageClass local de laboratorio</h3>
+<pre><code>
+apiVersion: storage.k8s.io/v1 # API de StorageClass.
+kind: StorageClass # Clase de almacenamiento.
+metadata: # Identidad.
+  name: local-storage # Nombre.
+provisioner: kubernetes.io/no-provisioner # PV administrado manualmente.
+volumeBindingMode: WaitForFirstConsumer # Espera al Pod para seleccionar nodo.
+reclaimPolicy: Retain # Conserva datos al borrar el PVC.
+</code></pre>
+<h3>PV</h3>
+<pre><code>
+apiVersion: v1 # API principal.
+kind: PersistentVolume # Volumen disponible.
+metadata: # Identidad.
+  name: app-pv # Nombre.
+spec: # Propiedades.
+  capacity: # Capacidad.
+    storage: 10Gi # Diez GiB.
+  volumeMode: Filesystem # Se monta como sistema de archivos.
+  accessModes: # Modos de acceso.
+    - ReadWriteOnce # Escritura desde un nodo.
+  persistentVolumeReclaimPolicy: Retain # Retiene el volumen.
+  storageClassName: local-storage # Clase asociada.
+  hostPath: # Ruta del nodo local; solo para laboratorio.
+    path: /mnt/data/app # Directorio dentro del nodo.
+    type: DirectoryOrCreate # Crea la carpeta si falta.
+</code></pre>
+<h3>PVC</h3>
+<pre><code>
+apiVersion: v1 # API principal.
+kind: PersistentVolumeClaim # Solicitud de almacenamiento.
+metadata: # Identidad.
+  name: app-pvc # Nombre.
+  namespace: demo # Namespace.
+spec: # Solicitud.
+  accessModes: # Modos requeridos.
+    - ReadWriteOnce # Un nodo con escritura.
+  storageClassName: local-storage # Clase solicitada.
+  volumeName: app-pv # PV concreto, opcional.
+  resources: # Recursos.
+    requests: # Solicitud minima.
+      storage: 10Gi # Capacidad.
+</code></pre>
+<p>Montar en un Pod:</p>
+<pre><code>
+volumes:
+  - name: app-data
+    persistentVolumeClaim:
+      claimName: app-pvc
+</code></pre>
+<pre><code>
+volumeMounts:
+  - name: app-data
+    mountPath: /var/lib/app
+</code></pre>
+<p>Consultar:</p>
+<pre><code>
+kubectl get storageclass
+kubectl get pv
+kubectl get pvc -n demo
+</code></pre>
+<p><code>hostPath</code> es util para aprender, pero no es una solucion portable para produccion. En la nube se usan discos administrados y provisionadores CSI.</p>
+<p>---</p>
+<h2>13. Jobs y CronJobs</h2>
+<p>Un <code>Job</code> ejecuta una tarea finita. Un <code>CronJob</code> crea Jobs en un horario.</p>
+<p>Expresion cron:</p>
+<pre><code>
+*/5 * * * *
+ |   | | | |
+ |   | | | +-- dia de la semana
+ |   | | +---- mes
+ |   | +------ dia del mes
+ |   +-------- hora
+ +------------ minuto
+</code></pre>
+<p>Limpieza automatica:</p>
+<pre><code>
+spec:
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+</code></pre>
+<p>Borra el Job y su Pod cinco minutos despues de terminar. El CronJob principal permanece programado.</p>
+<p>---</p>
+<h2>14. DaemonSets y monitoreo</h2>
+<p>Un DaemonSet no es una aplicacion visual. Es un agente que corre en cada nodo.</p>
+<p>Arquitectura de logs:</p>
+<pre><code>
+Logs del nodo -&gt; Fluent Bit DaemonSet -&gt; Loki -&gt; Grafana
+</code></pre>
+<p>Para monitorear recursos:</p>
+<pre><code>
+minikube addons enable metrics-server
+kubectl top nodes
+kubectl top pods -n demo
+</code></pre>
+<p>Para logs:</p>
+<pre><code>
+kubectl logs -n demo -l app=agent --tail=50
+</code></pre>
+<p>Grafana sola no almacena logs. Necesita una fuente como Loki, Prometheus o Elasticsearch.</p>
+<p>---</p>
+<h2>15. Flujo completo</h2>
+<p>Una aplicacion web tipica puede organizarse asi:</p>
+<pre><code>
+kubernetes/
+├── namespaces/
+├── pods/
+│   ├── deployment.yaml
+│   ├── statefulset.yaml
+│   ├── daemonset.yaml
+│   └── cronjob.yaml
+├── services/
+├── ingress/
+├── secrets/
+├── configmaps/
+├── storage/
+└── quotas/
+</code></pre>
+<p>Orden recomendado:</p>
+<pre><code>
+kubectl apply -f .\namespaces\
+kubectl apply -f .\secrets\
+kubectl apply -f .\configmaps\
+kubectl apply -f .\storage\
+kubectl apply -f .\pods\
+kubectl apply -f .\services\
+kubectl apply -f .\ingress\
+kubectl apply -f .\quotas\
+</code></pre>
+<p>En un proyecto real, conviene separar los archivos y aplicar la cuota antes de crear cargas de trabajo si quieres que todas sean validadas desde el principio.</p>
+<p>---</p>
+<h2>16. Diagnostico</h2>
+<h3>Pod no inicia</h3>
+<pre><code>
+kubectl get pods -n demo
+kubectl describe pod &lt;pod&gt; -n demo
+kubectl logs &lt;pod&gt; -n demo
+kubectl logs &lt;pod&gt; -n demo --previous
+</code></pre>
+<p>Estados comunes:</p>
+<ul>
+<li>`Pending`: no hay recursos, PVC o nodo disponible.</li>
+<li>`ImagePullBackOff`: imagen incorrecta o registro inaccesible.</li>
+<li>`CrashLoopBackOff`: el proceso arranca y termina repetidamente.</li>
+<li>`CreateContainerConfigError`: falta Secret o ConfigMap.</li>
+<li>`Running` pero no `Ready`: falla la readiness probe.</li>
+</ul>
+<h3>Deployment no actualiza</h3>
+<pre><code>
+kubectl rollout status deployment/web -n demo
+kubectl rollout history deployment/web -n demo
+kubectl rollout undo deployment/web -n demo
+</code></pre>
+<h3>Service no responde</h3>
+<pre><code>
+kubectl get service -n demo
+kubectl get endpoints -n demo
+kubectl describe service web -n demo
+</code></pre>
+<p>Si no hay endpoints, el selector del Service no coincide con las etiquetas de los Pods.</p>
+<h3>Ingress no responde</h3>
+<pre><code>
+kubectl get ingress -n demo
+kubectl describe ingress web -n demo
+kubectl get pods -n ingress-nginx
+</code></pre>
+<p>Verifica:</p>
+<ul>
+<li>Ingress Controller activo.</li>
+<li>Hostname en el archivo `hosts`.</li>
+<li>Certificado con el hostname correcto.</li>
+<li>Service y endpoints disponibles.</li>
+</ul>
+<h3>PVC pendiente</h3>
+<pre><code>
+kubectl describe pvc app-pvc -n demo
+kubectl get pv
+kubectl get storageclass
+</code></pre>
+<p>Causas comunes:</p>
+<ul>
+<li>`storageClassName` no coincide.</li>
+<li>El PV no tiene capacidad suficiente.</li>
+<li>Los modos de acceso no coinciden.</li>
+<li>El provisionador no esta instalado.</li>
+</ul>
+<p>---</p>
+<h2>17. Practica final</h2>
+<p>Construye una aplicacion generica con estos requisitos:</p>
+<p>1. Una imagen Docker multistage.</p>
+<p>2. Un Deployment con dos replicas.</p>
+<p>3. Un Service <code>ClusterIP</code>.</p>
+<p>4. Un Ingress HTTPS.</p>
+<p>5. Un ConfigMap para <code>APP_MODE</code>.</p>
+<p>6. Un Secret para <code>DB_PASSWORD</code>.</p>
+<p>7. Un StatefulSet para una base de datos de laboratorio.</p>
+<p>8. Un PVC de 1Gi.</p>
+<p>9. Un ResourceQuota.</p>
+<p>10. Un CronJob de health check.</p>
+<p>11. Un DaemonSet que recolecte logs.</p>
+<p>12. Un dashboard Grafana conectado a Loki.</p>
+<p>Comandos de verificacion:</p>
+<pre><code>
+kubectl get all -n demo
+kubectl get ingress -n demo
+kubectl get secrets,configmaps -n demo
+kubectl get pv,pvc -n demo
+kubectl get resourcequota -n demo
+kubectl get daemonset,cronjob -n demo
+kubectl top nodes
+kubectl top pods -n demo
+</code></pre>
+<h3>Checklist de aprendizaje</h3>
+<ul>
+<li>[ ] Puedo construir una imagen con Dockerfile.</li>
+<li>[ ] Entiendo la diferencia entre imagen y contenedor.</li>
+<li>[ ] Puedo publicar un puerto.</li>
+<li>[ ] Entiendo que un Pod es efimero.</li>
+<li>[ ] Se cuando usar Deployment y StatefulSet.</li>
+<li>[ ] Puedo conectar Pods mediante un Service.</li>
+<li>[ ] Puedo exponer HTTP con Ingress.</li>
+<li>[ ] Se diferenciar ConfigMap y Secret.</li>
+<li>[ ] Puedo limitar recursos con requests, limits y quota.</li>
+<li>[ ] Puedo persistir datos con PV y PVC.</li>
+<li>[ ] Puedo ejecutar tareas con Job y CronJob.</li>
+<li>[ ] Entiendo por que un DaemonSet sirve para agentes por nodo.</li>
+<li>[ ] Puedo diagnosticar Pods, Services, Ingress y PVCs.</li>
+</ul>
+<p>---</p>
+<h2>Cierre</h2>
+<p>Docker responde principalmente:</p>
+<pre><code>
+Como empaqueto y ejecuto mi aplicacion?
+</code></pre>
+<p>Kubernetes responde:</p>
+<pre><code>
+Como mantengo mi aplicacion disponible, conectada, configurada, escalada y observable?
+</code></pre>
+<p>La secuencia mental recomendada es:</p>
+<pre><code>
+Imagen -&gt; Contenedor -&gt; Pod -&gt; Controlador -&gt; Service -&gt; Ingress
+                         |          |
+                    ConfigMap    Secret
+                         |
+                       PVC -&gt; PV -&gt; StorageClass
+</code></pre>
+<p>Para un entorno de aprendizaje, empieza con un Pod y un Service. Luego agrega Deployment, configuracion, secretos, almacenamiento, Ingress y observabilidad una pieza a la vez.</p>
+</main></body></html>
