@@ -712,13 +712,13 @@ kubernetes/
 <p>Orden recomendado:</p>
 <pre><code>
 kubectl apply -f .\namespaces\
+kubectl apply -f .\quotas\
 kubectl apply -f .\secrets\
 kubectl apply -f .\configmaps\
 kubectl apply -f .\storage\
 kubectl apply -f .\pods\
 kubectl apply -f .\services\
 kubectl apply -f .\ingress\
-kubectl apply -f .\quotas\
 </code></pre>
 <p>En un proyecto real, conviene separar los archivos y aplicar la cuota antes de crear cargas de trabajo si quieres que todas sean validadas desde el principio.</p>
 <p>---</p>
