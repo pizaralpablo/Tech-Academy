@@ -1,4 +1,4 @@
-Paso 1- Crear un POD tipo Desployment, buscar un machote con la estructura minima puede ser de la pagina oficial, agregarle la secion "Resources:" y su respectiiva configuracion con valores como en el siguiente ejemplo:
+Paso 1: Crear un Deployment para administrar un Pod; buscar una plantilla con la estructura mínima (puede ser de la página oficial), agregar la sección "resources:" y su respectiva configuración con valores como en el siguiente ejemplo:
 
 resources:
     requests:
