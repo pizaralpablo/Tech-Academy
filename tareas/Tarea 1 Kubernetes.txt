@@ -1,0 +1,13 @@
+Paso 1: Crear un Deployment para administrar un Pod; buscar una plantilla con la estructura mínima (puede ser de la página oficial), agregar la sección "resources:" y su respectiva configuración con valores como en el siguiente ejemplo:
+
+resources:
+    requests:
+        cpu: 100m
+        memory: 128Mi
+    limits:
+        cpu: 500m
+        memory: 256Mi
+
+Utilizar la imagen que ustedes crearon para el contenedor del pod ya que vamos a crear un website.
+
+Paso 2- Crear un service tipo LoadBalancer para ese pod y poder exponer una ip publica y acceder a esa pagina web previamente creada por el pod anterior. Recuerden tener cuidado con el Label en el pod y el selector en el service tienen que hacer matc para poder hacer el bind entre ellos.
