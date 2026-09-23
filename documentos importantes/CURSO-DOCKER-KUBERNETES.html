@@ -134,7 +134,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala y compila la aplicacion.
-RUN npm ci &amp;&amp; npm run build
+RUN npm ci
 
 # Copia el codigo fuente.
 COPY . .
