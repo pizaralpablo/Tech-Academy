@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jonathan Muñoz | Tech Academy</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #38bdf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bg), #1e293b);
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      color: var(--text);
+      padding: 24px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 40px 48px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.8rem;
+    }
+    p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .stack {
+      margin-top: 24px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .stack span {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">Docker Challenge</span>
+    <h1>Hola, soy Jonathan Muñoz</h1>
+    <p>
+      Esta página se sirve desde una app Node.js/Express, empaquetada en un
+      contenedor Docker construido manualmente y desplegada en un clúster de
+      Kubernetes (Minikube) como entrega de Tech Academy.
+    </p>
+    <div class="stack">
+      <span>Docker</span>
+      <span>Node.js</span>
+      <span>Kubernetes</span>
+      <span>Tech Academy</span>
+    </div>
+  </div>
+</body>
+</html>
