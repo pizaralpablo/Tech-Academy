@@ -4,20 +4,20 @@ FROM node:20-alpine
 ENV NODE_ENV=production
 WORKDIR /app
 
-# 2. Copiamos archivos asignando permisos al usuario restringido 'node'
+# 2. Copiamos archivos de dependencias
 COPY --chown=node:node package*.json ./
 
 # 3. Instalación limpia de dependencias de producción
 RUN npm ci --only=production
 
-# 4. Copiamos el resto del código de forma segura
+# 4. Copiamos todo el código (incluye la carpeta public con index.html y styles.css)
 COPY --chown=node:node . .
 
-# 5. HEALTHCHECK: Enseña a Docker a saber si la app está colgada
+# 5. HEALTHCHECK
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000', (r) => r.statusCode === 200 ? process.exit(0) : process.exit(1))"
 
-# 6. SEGURIDAD: Cambiamos al usuario 'node' (evita ROOT)
+# 6. SEGURIDAD
 USER node
 
 EXPOSE 3000

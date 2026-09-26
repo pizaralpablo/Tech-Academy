@@ -1,5 +1,109 @@
-extends layout
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Sign In — Account
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    // Ambient Background Orbs
+    .orb.orb-1
+    .orb.orb-2
+    canvas#bg-canvas
 
-block content
-  h1= title
-  p Welcome to #{title}
+    // Main Glassmorphism Login Card
+    .login-card
+      .brand-header
+        .brand-logo
+          svg(width="24", height="24", viewBox="0 0 24 24", fill="none", stroke="white", stroke-width="2")
+            path(d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5")
+        h1 Sign in
+        p Welcome back. Enter your credentials.
+
+      form(action="#", method="POST")
+        .form-group
+          label(for="email") Email
+          .input-wrapper
+            input#email(type="email", placeholder="name@domain.com", required, autocomplete="email")
+
+        .form-group
+          label(for="password") Password
+          .input-wrapper
+            input#password(type="password", placeholder="••••••••", required, autocomplete="current-password")
+            button.toggle-pwd(type="button", onclick="togglePasswordVisibility()") 👁️
+
+        .form-actions
+          label.remember-me
+            input(type="checkbox")
+            span Remember me
+          a.forgot-link(href="#") Forgot password?
+
+        button.btn-submit(type="submit") Continue
+
+      .divider
+        span OR
+
+      .social-login
+        button.btn-social(type="button")
+          span  Apple
+        button.btn-social(type="button")
+          span G Google
+
+    script.
+      // Toggle Password Visibility
+      function togglePasswordVisibility() {
+        const pwdInput = document.getElementById('password');
+        pwdInput.type = pwdInput.type === 'password' ? 'text' : 'password';
+      }
+
+      // Interactive Dynamic Background Particles
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 0.5;
+          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.5 - 0.25;
+          this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+        draw() {
+          ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 60; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+
+      
