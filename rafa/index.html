@@ -18,18 +18,20 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 32px 20px;
       font-family: Arial, sans-serif;
       background: #0f172a;
       color: white;
     }
 
     .card {
-      width: 90%;
-      max-width: 700px;
-      padding: 60px 40px;
+      width: 100%;
+      max-width: 760px;
+      padding: 52px 44px 40px;
       text-align: center;
       background: #1e293b;
-      border-radius: 18px;
+      border: 1px solid #334155;
+      border-radius: 8px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
     }
 
@@ -42,63 +44,217 @@
       font-size: 1.2rem;
       font-weight: normal;
       color: #38bdf8;
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
-    p {
+    .intro {
+      max-width: 590px;
+      margin: 0 auto 26px;
       line-height: 1.7;
       color: #cbd5e1;
-      margin-bottom: 30px;
     }
 
     .tech {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .tech span {
-      padding: 8px 16px;
+      padding: 7px 14px;
       background: #334155;
       border-radius: 20px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      color: #e2e8f0;
     }
 
-    .status {
-      margin-top: 35px;
-      font-size: 0.9rem;
+    .lab-status {
+      margin-top: 34px;
+      padding-top: 28px;
+      border-top: 1px solid #475569;
+      text-align: left;
+    }
+
+    .status-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .status-heading h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #facc15;
+    }
+
+    .connection-status.is-running {
       color: #4ade80;
+    }
+
+    .connection-status.is-error {
+      color: #f87171;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 9px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      background: #475569;
+    }
+
+    .status-item {
+      min-width: 0;
+      padding: 16px;
+      background: #172033;
+    }
+
+    .status-item:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .status-label {
+      display: block;
+      margin-bottom: 6px;
+      color: #94a3b8;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .status-value {
+      display: block;
+      overflow-wrap: anywhere;
+      color: #f8fafc;
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 560px) {
+      .card {
+        padding: 40px 24px 28px;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .status-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 
 <body>
-
   <main class="card">
-
     <h1>Rafael Estrada</h1>
+    <h2>Cloud &bull; Security &bull; Engineering</h2>
 
-    <h2>Cloud • Security • Engineering</h2>
-
-    <p>
-      Tech Academy Docker Lab.<br>
-      This website is running inside a Docker container
-      and is served by Nginx.
+    <p class="intro">
+      Tech Academy Deployment Lab.<br>
+      This application is served by Node.js and Express, packaged with Docker,
+      and deployed on Kubernetes.
     </p>
 
-    <div class="tech">
+    <div class="tech" aria-label="Technologies used in this lab">
+      <span>Node.js</span>
+      <span>Express</span>
       <span>Docker</span>
-      <span>Linux</span>
-      <span>Cloud</span>
-      <span>Security</span>
+      <span>Kubernetes</span>
     </div>
 
-    <div class="status">
-      ● Container running
-    </div>
+    <section class="lab-status" aria-labelledby="status-title">
+      <div class="status-heading">
+        <h3 id="status-title">Deployment Status</h3>
+        <div class="connection-status" id="connection-status" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="connection-text">Checking API...</span>
+        </div>
+      </div>
 
+      <div class="status-grid">
+        <div class="status-item">
+          <span class="status-label">Runtime</span>
+          <span class="status-value" data-status="runtime">Loading...</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Container</span>
+          <span class="status-value" data-status="container">Loading...</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Orchestrator</span>
+          <span class="status-value" data-status="orchestrator">Loading...</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Replicas</span>
+          <span class="status-value" data-status="replicas">Loading...</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Service</span>
+          <span class="status-value" data-status="service">Loading...</span>
+        </div>
+      </div>
+    </section>
   </main>
 
+  <script>
+    const statusFields = ["runtime", "container", "orchestrator", "replicas", "service"];
+    const connectionStatus = document.getElementById("connection-status");
+    const connectionText = document.getElementById("connection-text");
+
+    // La interfaz obtiene estos datos de Express para confirmar que la API responde.
+    fetch("/api/status")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Status API unavailable");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        statusFields.forEach((field) => {
+          document.querySelector(`[data-status="${field}"]`).textContent = data[field];
+        });
+
+        connectionText.textContent = data.status;
+        connectionStatus.classList.add("is-running");
+      })
+      .catch(() => {
+        statusFields.forEach((field) => {
+          document.querySelector(`[data-status="${field}"]`).textContent = "Unavailable";
+        });
+
+        connectionText.textContent = "API unavailable";
+        connectionStatus.classList.add("is-error");
+      });
+  </script>
 </body>
 </html>
