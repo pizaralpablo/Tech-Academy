@@ -1,0 +1,278 @@
+:root {
+  --ink: #172127;
+  --muted: #607078;
+  --line: #d9e0df;
+  --paper: #f7f8f5;
+  --teal: #087b78;
+  --navy: #102f41;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Manrope", sans-serif;
+}
+
+.page-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.navbar {
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: inline-flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.brand > span:last-child {
+  color: var(--teal);
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  color: var(--teal);
+}
+
+.brand-mark svg {
+  display: block;
+  width: 100%;
+}
+
+.server-status {
+  color: #467069;
+  font: 500 12px "DM Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.server-status i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #54b895;
+  box-shadow: 0 0 0 4px #d9eee6;
+}
+
+.hero {
+  min-height: 560px;
+  padding: 90px 7% 82px;
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  align-items: center;
+  gap: 70px;
+}
+
+.eyebrow {
+  margin: 0 0 15px;
+  color: var(--teal);
+  text-transform: uppercase;
+  font: 500 11px "DM Mono", monospace;
+  letter-spacing: 0.11em;
+}
+
+.eyebrow span {
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  margin: 0 8px 4px 0;
+  background: currentColor;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 650px;
+  margin-bottom: 22px;
+  font-size: clamp(48px, 6vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -4px;
+}
+
+h1 em {
+  color: var(--teal);
+  font-style: normal;
+}
+
+.visual-card {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--navy);
+  box-shadow: 0 22px 38px rgba(18, 44, 57, 0.2);
+  transform: rotate(1.5deg);
+}
+
+.visual-label {
+  height: 43px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 15px;
+  background: #183c50;
+}
+
+.visual-label span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5eba91;
+}
+
+.visual-label span:first-child {
+  background: #ef8267;
+}
+
+.visual-label span:nth-child(2) {
+  background: #f2c065;
+}
+
+.visual-label p {
+  margin: 0 auto;
+  transform: translateX(-16px);
+  color: #a8c1c7;
+  font: 11px "DM Mono", monospace;
+}
+
+.visual-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.command-line {
+  padding: 18px 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #dce9e8;
+  font: 12px "DM Mono", monospace;
+}
+
+.command-line b {
+  color: #66d5c2;
+}
+
+.command-line strong {
+  margin-left: auto;
+  color: #8ed8a5;
+  font-size: 10px;
+}
+
+footer {
+  padding: 23px 0 31px;
+  display: flex;
+  justify-content: space-between;
+  color: #788687;
+  border-top: 1px solid var(--line);
+  font: 11px "DM Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+footer p {
+  margin: 0;
+}
+
+footer span {
+  margin: 0 8px;
+  color: var(--teal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-shell {
+    padding: 0 24px;
+  }
+
+  .navbar {
+    height: 72px;
+  }
+
+  .server-status {
+    font-size: 10px;
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 65px 0;
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .visual-card {
+    max-width: 480px;
+    width: 100%;
+    justify-self: center;
+  }
+
+  footer {
+    gap: 15px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand {
+    font-size: 17px;
+  }
+
+  .server-status {
+    display: none;
+  }
+
+  h1 {
+    letter-spacing: -2.8px;
+  }
+
+  .command-line strong {
+    display: none;
+  }
+
+  footer p:last-child {
+    display: none;
+  }
+}

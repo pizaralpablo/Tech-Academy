@@ -1,0 +1,12 @@
+{
+  "name": "tech-academy-jonathan",
+  "version": "1.0.0",
+  "description": "Servidor web con Node.js/Express para la tarea de Docker de Tech Academy",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

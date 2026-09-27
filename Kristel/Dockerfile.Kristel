@@ -1,0 +1,23 @@
+# Usa una imagen ligera de Alpine como etapa de preparacion del sitio 
+FROM alpine:3.20 AS build
+
+# Define la carpeta donde se guardaran los archivos estaticos
+WORKDIR /site
+
+# Copia la pagina web local dentro de la etapa de construccion 
+COPY index.html .
+
+# Usa Nginix Alpine como etpa final para ejecutar el servidor web
+FROM nginx:1.27-alpine AS runtime
+
+# Elimina la pagina determinada que incluye Nginx
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copia solamente el contenido preparado desde la etapa anterior
+COPY --from=build /site/index.html /usr/share/nginx/html/index.html
+
+# Documenta que el contenedor escuha en el puerto 80
+EXPOSE 80
+
+# Inicia Ngix en primer plano para que el contenedor permanezca activo
+CMD ["nginx", "-g", "daemon off;"]
