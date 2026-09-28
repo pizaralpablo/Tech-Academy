@@ -1,0 +1,64 @@
+# Le indicamos a Kubernetes qué versión de su API usaremos para crear este recurso.
+apiVersion: apps/v1
+
+# Le decimos qué tipo de recurso queremos crear.
+# En este caso queremos un Deployment que administre nuestra aplicación.
+kind: Deployment
+
+# Le damos una identidad a nuestro Deployment dentro de Kubernetes.
+metadata:
+  name: rafael-web
+
+# Aquí describimos el estado que queremos que Kubernetes mantenga para este Deployment.
+spec:
+
+  # Queremos mantener dos copias de nuestra aplicación ejecutándose.
+  replicas: 2
+
+  # Le indicamos al Deployment cómo reconocer cuáles Pods le pertenecen.
+  # Todo Pod que tenga la etiqueta "app: rafael-web" será parte de este Deployment.
+  selector:
+    matchLabels:
+      app: rafael-web
+
+  # Esta es la plantilla que Kubernetes usará cada vez que necesite crear un Pod.
+  template:
+    metadata:
+
+      # Le ponemos al Pod la misma etiqueta que nuestro Deployment está buscando.
+      labels:
+        app: rafael-web
+
+    # Aquí definimos qué va a ejecutarse dentro de cada Pod.
+    spec:
+      containers:
+
+        # Este será el contenedor que ejecutará nuestra aplicación.
+        - name: rafael-web
+          image: rafael-web-node:1.0
+
+          # Le indicamos a Kubernetes que use la imagen que ya cargamos en Minikube.
+          # Así evitamos que intente descargar nuestra imagen desde un registro externo.
+          imagePullPolicy: Never
+
+          # Indicamos que nuestra aplicación escucha en el puerto 3000 dentro del contenedor.
+          # Esto describe el puerto de la aplicación; todavía no la expone fuera del Pod.
+          ports:
+            - containerPort: 3000
+
+#Quiero un Deployment llamado rafael-web
+#        ↓
+#que mantenga 2 réplicas
+#        ↓
+#que identifique sus Pods con app=rafael-web
+#        ↓
+#y cuando necesite crear uno use esta plantilla
+#        ↓
+#Pod
+# └── container: rafael-web
+#      ├── image: rafael-web-node:1.0
+#      ├── no buscar la imagen afuera
+#      └── aplicación escucha en :3000
+
+
+
