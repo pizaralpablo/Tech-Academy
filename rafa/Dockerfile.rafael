@@ -1,0 +1,33 @@
+# Partimos de una imagen que ya trae Node.js instalado.
+# Usamos Alpine porque es una distribución Linux ligera y mantiene pequeña nuestra imagen.
+FROM node:20-alpine
+
+# Creamos /app como el directorio de trabajo de nuestra aplicación dentro del contenedor.
+# A partir de aquí, las siguientes instrucciones trabajarán tomando /app como ubicación actual.
+WORKDIR /app
+
+# Copiamos primero los archivos que describen las dependencias de nuestra aplicación.
+# Los copiamos antes que el resto del código para aprovechar mejor la caché de Docker.
+COPY package*.json ./
+
+# Instalamos las dependencias exactas registradas en package-lock.json.
+# En nuestro caso, aquí se instalará Express y todo lo que necesita para funcionar.
+RUN npm ci
+
+# Copiamos ahora el código de nuestra aplicación dentro de /app.
+# Aquí entran nuestro servidor Express y la página que este servidor va a entregar.
+COPY server.js index.html ./
+
+# Documentamos que nuestra aplicación Node escucha en el puerto 3000 dentro del contenedor.
+# EXPOSE no publica el puerto hacia nuestra PC; eso lo haremos después con docker run -p.
+EXPOSE 3000
+
+# Cuando arranque el contenedor, ejecutamos el script "start" definido en package.json.
+# Ese script ejecuta "node server.js", que levanta nuestro servidor Express.
+CMD ["npm", "start"]
+
+# El Dockerfile dice:
+# Parta de una imagen ligera que ya trae Node.js → prepare /app como nuestro espacio de trabajo →
+# copie la información de las dependencias e instálelas → copie nuestro servidor y la página web →
+# documente que la aplicación escucha en el puerto 3000 →
+# y cuando arranque el contenedor, ejecute nuestra aplicación con npm start.

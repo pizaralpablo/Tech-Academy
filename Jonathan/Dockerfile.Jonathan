@@ -1,0 +1,21 @@
+# Imagen base ligera de Node.js
+FROM node:20-alpine
+
+# Directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Copiamos primero los manifiestos para aprovechar la cache de capas de Docker
+COPY package.json ./
+
+# Instalamos las dependencias (Express)
+RUN npm install --omit=dev
+
+# Copiamos el resto del código de la aplicación (servidor + página estática)
+COPY server.js ./
+COPY public ./public
+
+# Puerto en el que escucha nuestro servidor Express
+EXPOSE 3000
+
+# Arrancamos el servidor Node.js
+CMD ["node", "server.js"]

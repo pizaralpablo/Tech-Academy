@@ -1,0 +1,27 @@
+# Usamos la API principal de Kubernetes para crear nuestro Service.
+apiVersion: v1
+
+# Le decimos a Kubernetes que queremos crear un recurso de tipo Service.
+# El Service será el punto estable para comunicarnos con nuestros Pods.
+kind: Service
+
+# Le damos un nombre a nuestro Service dentro de Kubernetes.
+metadata:
+  name: rafael-web-service
+
+# Aquí definimos cómo funcionará nuestro Service.
+spec:
+
+  # El Service enviará tráfico únicamente a los Pods que tengan esta etiqueta.
+  selector:
+    app: rafael-web
+
+  # Definimos el puerto por el que nuestro Service recibirá tráfico
+  # y el puerto de los Pods al que enviará ese tráfico.
+  ports:
+    - port: 80
+      targetPort: 3000
+
+  # Usamos LoadBalancer para exponer nuestro Service fuera del cluster.
+  # En Minikube necesitaremos un mecanismo local para acceder a este LoadBalancer.
+  type: LoadBalancer
