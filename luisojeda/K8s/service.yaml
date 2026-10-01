@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-homework
+  namespace: mynamespace
+  labels: 
+    app: web-app-homework
+spec:
+  type: LoadBalancer
+  selector:
+      app: web-app-homework
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http  
