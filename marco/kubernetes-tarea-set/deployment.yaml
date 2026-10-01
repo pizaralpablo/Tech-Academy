@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marco-deployment
+  labels:
+    app: marco-website
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: marco-website
+  template:
+    metadata:
+      labels:
+        app: marco-website
+    spec:
+      containers:
+      - name: marco-app
+        image: marco-app
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
