@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+# Base de datos PostgreSQL con identidad estable, credenciales y almacenamiento persistente.
+# Identidad y etiquetas de la base de datos.
+metadata:
+  name: postgres
+  namespace: test
+  labels:
+    app: postgres
+spec:
+  # Identidad estable, replicas y selector del StatefulSet.
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    # Etiquetas y configuracion de ejecucion del Pod.
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      # Contenedor PostgreSQL con recursos, credenciales y comprobacion de salud.
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          env:
+            # Credenciales de PostgreSQL obtenidas del Secret del namespace.
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: POSTGRES_PASSWORD
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          # Directorio persistente donde PostgreSQL guarda los datos.
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        # PVC que conserva los datos de PostgreSQL fuera del contenedor.
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc

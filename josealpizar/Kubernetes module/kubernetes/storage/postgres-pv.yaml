@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: PersistentVolume
+# Almacenamiento local reservado para los datos de PostgreSQL.
+# Identidad del volumen persistente.
+metadata:
+  name: postgres-pv
+spec:
+  # Capacidad, formato y modo de acceso del volumen.
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  # Politicas que controlan la recuperacion y vinculacion del volumen.
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: postgres-local
+  # Ruta persistente dentro del nodo Minikube.
+  hostPath:
+    path: /mnt/data/postgres
+    type: DirectoryOrCreate

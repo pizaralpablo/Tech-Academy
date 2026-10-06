@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+# Entrada HTTPS para la aplicacion web Node.
+# Identidad, namespace y reglas adicionales del Ingress.
+metadata:
+  name: node-web
+  namespace: test
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  # Clase, certificado TLS y rutas que dirigen hacia Node Web.
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - k8s-lab.local
+      secretName: node-web-tls
+  rules:
+    # Host publico y backend de la aplicacion web.
+    - host: k8s-lab.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: node-web
+                port:
+                  number: 8080

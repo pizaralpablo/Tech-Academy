@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+# Interfaz Grafana con aprovisionamiento de Loki y dashboards del laboratorio.
+# Identidad y etiquetas usadas por Grafana.
+metadata:
+  name: grafana
+  namespace: test
+  labels:
+    app: grafana
+spec:
+  # Replica, selector y plantilla del Pod de Grafana.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    # Etiquetas y configuracion de ejecucion del Pod.
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      # Contenedor Grafana, credenciales locales y comprobacion de salud.
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.4.0
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            # Ajustes de acceso y registro de usuarios de Grafana.
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin123
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: "false"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          # Archivos de provisionamiento y almacenamiento de Grafana.
+          volumeMounts:
+            - name: datasource
+              mountPath: /etc/grafana/provisioning/datasources/loki.yaml
+              subPath: loki.yaml
+              readOnly: true
+            - name: dashboards
+              mountPath: /etc/grafana/provisioning/dashboards/provider.yaml
+              subPath: provider.yaml
+              readOnly: true
+            - name: dashboards
+              mountPath: /var/lib/grafana/dashboards/kubernetes-lab.json
+              subPath: kubernetes-lab.json
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/grafana
+      volumes:
+        # ConfigMaps de provisionamiento y volumen temporal para los datos.
+        - name: datasource
+          configMap:
+            name: grafana-datasource
+        - name: dashboards
+          configMap:
+            name: grafana-dashboard
+        - name: data
+          emptyDir: {}

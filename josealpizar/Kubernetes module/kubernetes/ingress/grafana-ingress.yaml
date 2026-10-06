@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+# Entrada HTTPS para la interfaz de Grafana.
+# Identidad, namespace y reglas adicionales del Ingress.
+metadata:
+  name: grafana
+  namespace: test
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  # Clase, certificado TLS y ruta que dirige hacia Grafana.
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - grafana.k8s-lab.local
+      secretName: node-web-tls
+  rules:
+    # Host publico y backend de Grafana.
+    - host: grafana.k8s-lab.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000

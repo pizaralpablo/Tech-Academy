@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+# Acceso interno para que Fluent Bit y Grafana consulten Loki.
+# Identidad y namespace del Service de Loki.
+metadata:
+  name: loki
+  namespace: test
+spec:
+  # Acceso interno, selector de Loki y puerto HTTP del servicio.
+  type: ClusterIP
+  selector:
+    app: loki
+  ports:
+    # Puerto usado por Fluent Bit y Grafana para consultar Loki.
+    - name: http
+      port: 3100
+      targetPort: http

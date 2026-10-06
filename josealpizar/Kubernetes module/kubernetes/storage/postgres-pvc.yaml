@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+# Solicitud de almacenamiento que vincula PostgreSQL con el PV local.
+# Identidad y namespace de la solicitud.
+metadata:
+  name: postgres-pvc
+  namespace: test
+spec:
+  # Modo de acceso y volumen local que debe satisfacer la solicitud.
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: postgres-local
+  volumeName: postgres-pv
+  # Capacidad minima de almacenamiento solicitada.
+  resources:
+    requests:
+      storage: 1Gi

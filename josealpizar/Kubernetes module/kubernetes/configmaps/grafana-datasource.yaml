@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+# Fuente de datos de Loki provisionada automaticamente por Grafana.
+# Identidad, namespace y etiqueta de provisionamiento de Grafana.
+metadata:
+  name: grafana-datasource
+  namespace: test
+  labels:
+    grafana_datasource: "1"
+# Archivo de provisionamiento de fuentes de datos.
+data:
+  # Fuente Loki que Grafana usara como origen predeterminado.
+  loki.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        uid: loki
+        type: loki
+        access: proxy
+        url: http://loki:3100
+        isDefault: true
+        editable: false

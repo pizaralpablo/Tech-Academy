@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Servidor web | Docker + Node</title>
+  <style>
+    :root {
+      --ink: #173042;
+      --muted: #607582;
+      --paper: #f4f8f7;
+      --card: rgba(255, 255, 255, 0.88);
+      --teal: #0f766e;
+      --coral: #ef8354;
+      --line: #dce9e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(rgba(15, 118, 110, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 118, 110, 0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      font-family: "Trebuchet MS", sans-serif;
+    }
+
+    main {
+      width: min(100%, 680px);
+      padding: clamp(32px, 7vw, 68px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: 0 24px 70px rgba(23, 48, 66, 0.14);
+      animation: appear 600ms ease-out both;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 28px;
+      color: var(--teal);
+      font-size: 0.78rem;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--coral);
+      box-shadow: 0 0 0 6px rgba(239, 131, 84, 0.14);
+    }
+
+    h1 {
+      max-width: 530px;
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: clamp(2.4rem, 7vw, 4.8rem);
+      font-weight: normal;
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      max-width: 500px;
+      margin: 24px 0 36px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+
+    .details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .detail {
+      flex: 1 1 150px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--coral);
+      background: rgba(244, 248, 247, 0.8);
+    }
+
+    .detail strong,
+    .detail span {
+      display: block;
+    }
+
+    .detail strong {
+      margin-bottom: 5px;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .detail span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .auth {
+      display: grid;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .auth input,
+    .auth button {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      font: inherit;
+    }
+
+    .auth input {
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .auth-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .auth button {
+      flex: 1 1 150px;
+      border-color: var(--teal);
+      color: #fff;
+      background: var(--teal);
+      cursor: pointer;
+    }
+
+    .auth button.secondary {
+      border-color: var(--coral);
+      color: var(--ink);
+      background: transparent;
+    }
+
+    #message {
+      min-height: 1.5em;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .dashboard {
+      display: none;
+    }
+
+    .dashboard.visible {
+      display: block;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dashboard-header h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+    }
+
+    .logout {
+      width: auto;
+      padding: 10px 14px;
+      border: 1px solid var(--coral);
+      border-radius: 4px;
+      color: var(--ink);
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: rgba(244, 248, 247, 0.8);
+    }
+
+    .stat strong,
+    .stat span {
+      display: block;
+    }
+
+    .stat strong {
+      margin-bottom: 8px;
+      color: var(--teal);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat span {
+      font-size: 1.15rem;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      main {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section id="login-view">
+      <p class="eyebrow"><span class="pulse"></span> Acceso seguro</p>
+      <h1>Bienvenido</h1>
+      <p class="intro">Inicia sesion para entrar al dashboard de tu servidor Node.js.</p>
+      <form class="auth" id="auth-form">
+      <input id="username" name="username" type="text" minlength="3" maxlength="80" placeholder="Usuario" required>
+      <input id="password" name="password" type="password" minlength="8" placeholder="Password (minimo 8 caracteres)" required>
+      <div class="auth-actions">
+        <button class="secondary" type="submit" data-action="login">Iniciar sesion</button>
+        <button type="submit" data-action="register">Crear usuario</button>
+      </div>
+      <p id="message" role="status"></p>
+      </form>
+    </section>
+    <section class="dashboard" id="dashboard-view" aria-live="polite">
+      <div class="dashboard-header">
+        <div>
+          <p class="eyebrow"><span class="pulse"></span> Dashboard</p>
+          <h1>Hola, <span id="dashboard-user"></span></h1>
+        </div>
+        <button class="logout" id="logout-button" type="button">Cerrar sesion</button>
+      </div>
+      <p class="intro">Tu cuenta esta conectada a PostgreSQL dentro del cluster Kubernetes.</p>
+      <div class="stats">
+        <div class="stat"><strong>Estado</strong><span>Cuenta activa</span></div>
+        <div class="stat"><strong>Base de datos</strong><span>PostgreSQL</span></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const form = document.querySelector('#auth-form');
+    const message = document.querySelector('#message');
+    const loginView = document.querySelector('#login-view');
+    const dashboardView = document.querySelector('#dashboard-view');
+    const dashboardUser = document.querySelector('#dashboard-user');
+
+    const showDashboard = (user) => {
+      dashboardUser.textContent = user.username;
+      loginView.style.display = 'none';
+      dashboardView.classList.add('visible');
+    };
+
+    const checkSession = async () => {
+      const response = await fetch('/api/me');
+      if (response.ok) showDashboard(await response.json());
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const action = event.submitter.dataset.action;
+      const payload = {
+        username: form.username.value,
+        password: form.password.value
+      };
+
+      message.textContent = 'Procesando...';
+      try {
+        const response = await fetch(`/api/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        message.textContent = result.message || result.error;
+        if (action === 'login' && response.ok) showDashboard(result);
+      } catch {
+        message.textContent = 'No se pudo conectar con el servidor.';
+      }
+    });
+
+    document.querySelector('#logout-button').addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST' });
+      dashboardView.classList.remove('visible');
+      loginView.style.display = 'block';
+      form.reset();
+      message.textContent = 'Sesion cerrada.';
+    });
+
+    checkSession().catch(() => {});
+  </script>
+</body>
+</html>

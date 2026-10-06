@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+# Service headless que proporciona identidad de red estable a PostgreSQL.
+# Identidad y namespace del Service de PostgreSQL.
+metadata:
+  name: postgres
+  namespace: test
+spec:
+  # Service headless, selector de la base de datos y puerto PostgreSQL.
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+    # Puerto estable usado por los clientes de PostgreSQL.
+    - name: postgres
+      port: 5432
+      targetPort: postgres
