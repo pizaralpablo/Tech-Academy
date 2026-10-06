@@ -1,0 +1,7 @@
+Crear una DB usando un yaml para Statefulset
+
+1- crear una imagen de base de datos en docker (cualqquier DB relacional)usar IA para que les ayude a configura la app para que cree usuarios y contrasenas y las guarde en la DB
+2- crear un pod tipo statefulset que consuma la imagen de db qque crearon
+3- crear un service tipo ClusterIP para el Statefulset
+
+consultas o dudas me avisan.
