@@ -1,0 +1,12 @@
+apiVersion: v1 # Version de la API de Kubernetes que define los Services.
+kind: Service # Indica que este manifiesto crea un Service para acceder a Pods.
+metadata: # Inicio de los datos que identifican al recurso.
+  name: tarea # Nombre del Service dentro del namespace.
+  namespace: tarea # Namespace donde se creara el Service; debe coincidir con el de los Pods.
+spec: # Configuracion de como el Service encuentra y expone los Pods.
+  type: LoadBalancer # Solicita una IP externa mediante un balanceador compatible con el cluster.
+  selector: # Etiquetas que deben tener los Pods para recibir trafico de este Service.
+    app: tarea # Envia trafico a los Pods cuya etiqueta app tenga el valor tarea.
+  ports: # Lista de puertos que el Service ofrece.
+    - port: 8080 # Puerto en el que los clientes acceden al Service.
+      targetPort: 80 # Puerto del contenedor al que Kubernetes reenvia el trafico.

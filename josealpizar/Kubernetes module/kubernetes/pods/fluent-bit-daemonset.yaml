@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: DaemonSet
+# Agente de logs desplegado en cada nodo para enviar registros a Loki.
+# Identidad y etiquetas del agente de logs.
+metadata:
+  name: fluent-bit
+  namespace: test
+  labels:
+    app: fluent-bit
+spec:
+  # Selector y plantilla que despliegan un agente por nodo.
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    # Etiquetas y permisos usados por el Pod de Fluent Bit.
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      serviceAccountName: fluent-bit
+      # Tolerancias, contenedor del agente y archivos que se le montan.
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: fluent-bit
+          image: cr.fluentbit.io/fluent/fluent-bit:3.2.10
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          volumeMounts:
+            # Configuracion de Fluent Bit y lectura de logs del nodo.
+            - name: config
+              mountPath: /fluent-bit/etc/fluent-bit.conf
+              subPath: fluent-bit.conf
+              readOnly: true
+            - name: config
+              mountPath: /fluent-bit/etc/parsers.conf
+              subPath: parsers.conf
+              readOnly: true
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: containers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+      volumes:
+        # ConfigMap de Fluent Bit y rutas de logs expuestas desde el nodo.
+        - name: config
+          configMap:
+            name: fluent-bit-config
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: containers
+          hostPath:
+            path: /var/lib/docker/containers
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: ServiceAccount
+# Identidad utilizada por Fluent Bit para consultar metadatos del cluster.
+# Metadatos de la cuenta usada por el DaemonSet.
+metadata:
+  name: fluent-bit
+  namespace: test
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+# Permisos de solo lectura para obtener metadatos de Pods y namespaces.
+# Identidad del rol y permisos RBAC concedidos.
+metadata:
+  name: fluent-bit
+rules:
+  # Lectura de Pods y namespaces para enriquecer los logs.
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+# Vincula los permisos de lectura con la cuenta de Fluent Bit.
+# Identidad del vinculo y rol que se asigna.
+metadata:
+  name: fluent-bit
+roleRef:
+  # Rol de cluster que recibe la cuenta de servicio.
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit
+subjects:
+  # Cuenta de servicio de Fluent Bit dentro del namespace test.
+  - kind: ServiceAccount
+    name: fluent-bit
+    namespace: test

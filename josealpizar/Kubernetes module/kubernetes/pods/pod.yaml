@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+# Pod de ejemplo para comprobar una ejecucion basica en el namespace.
+# Identidad y etiquetas del Pod de prueba.
+metadata:
+  name: nginx-pod
+  namespace: test
+  labels:
+    app: nginx
+spec:
+  # Contenedor Nginx usado para validar el funcionamiento basico.
+  containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+        - containerPort: 80

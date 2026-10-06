@@ -1,0 +1,11 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+# Clase para el almacenamiento local administrado manualmente.
+# Identidad de la clase y parametros de vinculacion de volumenes.
+metadata:
+  name: postgres-local
+provisioner: kubernetes.io/no-provisioner
+# Politica de vinculacion, recuperacion y expansion del almacenamiento.
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+allowVolumeExpansion: false

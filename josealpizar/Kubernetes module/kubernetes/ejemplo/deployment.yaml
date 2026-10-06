@@ -1,0 +1,31 @@
+apiVersion: apps/v1 # Version de la API de Kubernetes que define los Deployments.
+kind: Deployment # Indica que este manifiesto crea y administra un Deployment.
+metadata: # Inicio de los datos que identifican al recurso.
+  name: tarea # Nombre del Deployment dentro del namespace.
+  namespace: tarea # Namespace donde se creara el Deployment; debe existir previamente.
+  labels: # Etiquetas que identifican y permiten seleccionar este recurso.
+    app: tarea # Etiqueta de aplicacion; debe coincidir con el selector y las etiquetas de los Pods.
+spec: # Configuracion deseada que Kubernetes intentara mantener.
+  replicas: 3 # Cantidad de Pods que el Deployment mantendra en ejecucion.
+  selector: # Regla que usa el Deployment para encontrar y administrar sus Pods.
+    matchLabels: # Los Pods seleccionados deben tener estas etiquetas.
+      app: tarea # Selecciona los Pods cuya etiqueta app tenga el valor tarea.
+  template: # Plantilla usada para crear cada Pod del Deployment.
+    metadata: # Metadatos que se asignaran a cada Pod nuevo.
+      labels: # Etiquetas que llevaran los Pods creados.
+        app: tarea # Debe coincidir con selector.matchLabels para que el Deployment los administre.
+    spec: # Configuracion interna de cada Pod.
+      containers: # Lista de contenedores que se ejecutaran dentro del Pod.
+        - name: tarea # Nombre del contenedor dentro del Pod.
+          image: nginx:latest # Imagen y etiqueta que Kubernetes usara para crear el contenedor.
+          imagePullPolicy: Never # No descarga la imagen; esta debe existir ya en el nodo de Kubernetes.
+          ports: # Puertos que el contenedor declara como usados.
+            - name: http # Nombre descriptivo del puerto, util para referenciarlo desde un Service.
+              containerPort: 80 # Puerto en el que escucha Nginx dentro del contenedor.
+          resources: # Recursos de CPU y memoria solicitados y limitados para el contenedor.
+            requests: # Cantidad minima reservada y usada por Kubernetes al ubicar el Pod.
+              cpu: 100m # Solicita 0.1 CPU, es decir, una decima parte de un nucleo.
+              memory: 128Mi # Solicita 128 mebibytes de memoria.
+            limits: # Maximos de recursos que el contenedor puede consumir.
+              cpu: 200m # Limita el uso a 0.2 CPU; si excede, se restringe su ejecucion.
+              memory: 256Mi # Limita la memoria a 256 mebibytes; si excede, el contenedor puede reiniciarse.

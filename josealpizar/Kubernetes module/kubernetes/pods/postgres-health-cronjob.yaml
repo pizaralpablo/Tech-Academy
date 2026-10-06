@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+# Comprobacion programada de disponibilidad de PostgreSQL mediante pg_isready.
+# Identidad y namespace del proceso de comprobacion.
+metadata:
+  name: postgres-health-check
+  namespace: test
+spec:
+  # Frecuencia, politicas de ejecucion e historial de Jobs.
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    # Plantilla del Job que ejecuta la comprobacion de PostgreSQL.
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 60
+      ttlSecondsAfterFinished: 300
+      template:
+        # Etiquetas y politica de reinicio del Pod temporal.
+        metadata:
+          labels:
+            app: postgres-health-check
+        spec:
+          restartPolicy: Never
+          # Contenedor con recursos, credenciales y comando de health check.
+          containers:
+            - name: postgres-health-check
+              image: postgres:16-alpine
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 50m
+                  memory: 32Mi
+              env:
+                # Datos de conexion obtenidos del Service y del Secret.
+                - name: PGHOST
+                  value: postgres
+                - name: PGPORT
+                  value: "5432"
+                - name: PGDATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_DB
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_USER
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-credentials
+                      key: POSTGRES_PASSWORD
+              command: ["sh", "-c", "pg_isready -h \"$PGHOST\" -p \"$PGPORT\" -U \"$PGUSER\" -d \"$PGDATABASE\""]

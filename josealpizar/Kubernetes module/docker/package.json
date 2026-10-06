@@ -1,0 +1,9 @@
+{
+  "name": "k8s-lab-web",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "pg": "^8.16.3"
+  }
+}

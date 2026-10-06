@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+# Acceso interno para la aplicacion web; el Ingress es el punto de entrada.
+# Identidad y namespace del Service.
+metadata:
+  name: node-web
+  namespace: test
+spec:
+  # Tipo de acceso, selector de Pods y puerto publicado.
+  type: ClusterIP
+  selector:
+    app: node-web
+  ports:
+    # Puerto HTTP que dirige las peticiones hacia Node Web.
+    - name: http
+      port: 8080
+      targetPort: http

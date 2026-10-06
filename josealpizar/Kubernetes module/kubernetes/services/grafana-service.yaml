@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+# Acceso interno para Grafana; el Ingress gestiona la entrada externa.
+# Identidad y namespace del Service de Grafana.
+metadata:
+  name: grafana
+  namespace: test
+spec:
+  # Acceso interno, selector de Grafana y puerto HTTP del servicio.
+  type: ClusterIP
+  selector:
+    app: grafana
+  ports:
+    # Puerto usado por el Ingress para llegar a Grafana.
+    - name: http
+      port: 3000
+      targetPort: http
