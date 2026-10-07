@@ -27,3 +27,14 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+          env:
+            - name: DB_HOST
+              value: jonathan-db-service
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: jonathan
+            - name: DB_PASSWORD
+              value: changeme123
+            - name: DB_NAME
+              value: techacademy
