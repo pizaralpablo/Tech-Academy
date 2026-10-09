@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 Iniciar sesión
+  form(method="POST" action="/login")
+    input(type="text" name="usuario" placeholder="Usuario")
+    br
+    input(type="password" name="contrasena" placeholder="Contraseña")
+    br
+    button(type="submit") Entrar
