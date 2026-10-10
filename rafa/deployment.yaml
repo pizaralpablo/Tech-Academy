@@ -38,7 +38,7 @@ spec:
 
         # Este será el contenedor que ejecutará nuestra aplicación.
         - name: rafael-web
-          image: rafael-web-node:1.2
+          image: rafael-web-node:1.3
 
           # Le indicamos a Kubernetes que use la imagen que ya cargamos en Minikube.
           # Así evitamos que intente descargar nuestra imagen desde un registro externo.

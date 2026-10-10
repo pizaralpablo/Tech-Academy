@@ -69,6 +69,11 @@ const labStatus = {
       state: "Completed",
       summary: "Deployment, resource controls and LoadBalancer configured in rafa-lab.",
     },
+    {
+      title: "Kubernetes Task 2",
+      state: "Completed",
+      summary: "PostgreSQL StatefulSet, ClusterIP Service, persistent storage and user registration.",
+    },
   ],
 };
 
