@@ -9,6 +9,9 @@ kind: Deployment
 metadata:
   name: rafael-web
 
+  # Este Deployment pertenecerá únicamente al Namespace rafa-lab.
+  namespace: rafa-lab
+
 # Aquí describimos el estado que queremos que Kubernetes mantenga para este Deployment.
 spec:
 
@@ -35,11 +38,20 @@ spec:
 
         # Este será el contenedor que ejecutará nuestra aplicación.
         - name: rafael-web
-          image: rafael-web-node:1.0
+          image: rafael-web-node:1.1
 
           # Le indicamos a Kubernetes que use la imagen que ya cargamos en Minikube.
           # Así evitamos que intente descargar nuestra imagen desde un registro externo.
           imagePullPolicy: Never
+
+          # Reservamos los recursos básicos del contenedor y limitamos su consumo máximo.
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
 
           # Indicamos que nuestra aplicación escucha en el puerto 3000 dentro del contenedor.
           # Esto describe el puerto de la aplicación; todavía no la expone fuera del Pod.
@@ -56,7 +68,7 @@ spec:
 #        ↓
 #Pod
 # └── container: rafael-web
-#      ├── image: rafael-web-node:1.0
+#      ├── image: rafael-web-node:1.1
 #      ├── no buscar la imagen afuera
 #      └── aplicación escucha en :3000
 

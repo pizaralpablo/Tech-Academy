@@ -26,7 +26,7 @@
 
     .card {
       width: 100%;
-      max-width: 760px;
+      max-width: 820px;
       padding: 52px 44px 40px;
       text-align: center;
       background: #1e293b;
@@ -89,6 +89,13 @@
       font-weight: 600;
     }
 
+    .lab-context {
+      margin-bottom: 14px;
+      color: #7dd3fc;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
     .connection-status {
       display: flex;
       align-items: center;
@@ -130,7 +137,7 @@
       background: #172033;
     }
 
-    .status-item:last-child {
+    .status-item:last-child:nth-child(odd) {
       grid-column: 1 / -1;
     }
 
@@ -151,6 +158,78 @@
       font-weight: 600;
     }
 
+    .course-progress {
+      margin-top: 30px;
+      padding-top: 28px;
+      border-top: 1px solid #475569;
+      text-align: left;
+    }
+
+    .progress-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .progress-heading h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .progress-summary {
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
+
+    .progress-list {
+      border-top: 1px solid #334155;
+    }
+
+    .progress-item {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 17px 0;
+      border-bottom: 1px solid #334155;
+    }
+
+    .progress-marker {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+    }
+
+    .progress-title {
+      display: block;
+      margin-bottom: 4px;
+      color: #f8fafc;
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    .progress-description,
+    .progress-empty {
+      color: #94a3b8;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .progress-state {
+      color: #4ade80;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .progress-empty {
+      padding: 17px 0;
+      border-bottom: 1px solid #334155;
+    }
+
     @media (max-width: 560px) {
       .card {
         padding: 40px 24px 28px;
@@ -166,8 +245,22 @@
         gap: 10px;
       }
 
+      .progress-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+
       .status-grid {
         grid-template-columns: 1fr;
+      }
+
+      .progress-item {
+        grid-template-columns: 12px minmax(0, 1fr);
+      }
+
+      .progress-state {
+        grid-column: 2;
       }
     }
   </style>
@@ -200,35 +293,96 @@
         </div>
       </div>
 
-      <div class="status-grid">
+      <p class="lab-context" id="lab-context">Loading lab context...</p>
+
+      <div class="status-grid" id="deployment-grid" aria-live="polite">
         <div class="status-item">
-          <span class="status-label">Runtime</span>
-          <span class="status-value" data-status="runtime">Loading...</span>
+          <span class="status-label">Deployment data</span>
+          <span class="status-value">Loading...</span>
         </div>
-        <div class="status-item">
-          <span class="status-label">Container</span>
-          <span class="status-value" data-status="container">Loading...</span>
-        </div>
-        <div class="status-item">
-          <span class="status-label">Orchestrator</span>
-          <span class="status-value" data-status="orchestrator">Loading...</span>
-        </div>
-        <div class="status-item">
-          <span class="status-label">Replicas</span>
-          <span class="status-value" data-status="replicas">Loading...</span>
-        </div>
-        <div class="status-item">
-          <span class="status-label">Service</span>
-          <span class="status-value" data-status="service">Loading...</span>
-        </div>
+      </div>
+    </section>
+
+    <section class="course-progress" aria-labelledby="progress-title">
+      <div class="progress-heading">
+        <h3 id="progress-title">Course Progress</h3>
+        <span class="progress-summary" id="progress-summary">Loading progress...</span>
+      </div>
+
+      <div class="progress-list" id="progress-list" aria-live="polite">
+        <p class="progress-empty">Loading course milestones...</p>
       </div>
     </section>
   </main>
 
   <script>
-    const statusFields = ["runtime", "container", "orchestrator", "replicas", "service"];
+    const legacyFields = ["runtime", "container", "orchestrator", "replicas", "service"];
     const connectionStatus = document.getElementById("connection-status");
     const connectionText = document.getElementById("connection-text");
+    const labContext = document.getElementById("lab-context");
+    const deploymentGrid = document.getElementById("deployment-grid");
+    const progressList = document.getElementById("progress-list");
+    const progressSummary = document.getElementById("progress-summary");
+
+    function renderDeployment(items) {
+      const fragment = document.createDocumentFragment();
+
+      items.forEach((item) => {
+        const container = document.createElement("div");
+        const label = document.createElement("span");
+        const value = document.createElement("span");
+
+        container.className = "status-item";
+        label.className = "status-label";
+        value.className = "status-value";
+        label.textContent = item.label;
+        value.textContent = item.value;
+        container.append(label, value);
+        fragment.append(container);
+      });
+
+      deploymentGrid.replaceChildren(fragment);
+    }
+
+    function renderMilestones(milestones) {
+      const fragment = document.createDocumentFragment();
+      const completed = milestones.filter((milestone) => milestone.state === "Completed").length;
+
+      progressSummary.textContent = `${completed} of ${milestones.length} completed`;
+
+      if (milestones.length === 0) {
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "progress-empty";
+        emptyMessage.textContent = "Course progress unavailable.";
+        progressList.replaceChildren(emptyMessage);
+        return;
+      }
+
+      milestones.forEach((milestone) => {
+        const item = document.createElement("div");
+        const marker = document.createElement("span");
+        const copy = document.createElement("div");
+        const title = document.createElement("span");
+        const description = document.createElement("p");
+        const state = document.createElement("span");
+
+        item.className = "progress-item";
+        marker.className = "progress-marker";
+        copy.className = "progress-copy";
+        title.className = "progress-title";
+        description.className = "progress-description";
+        state.className = "progress-state";
+        marker.setAttribute("aria-hidden", "true");
+        title.textContent = milestone.title;
+        description.textContent = milestone.summary;
+        state.textContent = milestone.state;
+        copy.append(title, description);
+        item.append(marker, copy, state);
+        fragment.append(item);
+      });
+
+      progressList.replaceChildren(fragment);
+    }
 
     // La interfaz obtiene estos datos de Express para confirmar que la API responde.
     fetch("/api/status")
@@ -240,18 +394,23 @@
         return response.json();
       })
       .then((data) => {
-        statusFields.forEach((field) => {
-          document.querySelector(`[data-status="${field}"]`).textContent = data[field];
-        });
+        const deploymentItems = Array.isArray(data.deployment) && data.deployment.length > 0
+          ? data.deployment
+          : legacyFields.map((field) => ({ label: field, value: data[field] }));
+        const milestones = Array.isArray(data.milestones) ? data.milestones : [];
+        const contextTitle = data.context?.title || "Kubernetes Lab";
+        const namespace = data.context?.namespace || "rafa-lab";
 
+        labContext.textContent = `${contextTitle} — Namespace: ${namespace}`;
+        renderDeployment(deploymentItems);
+        renderMilestones(milestones);
         connectionText.textContent = data.status;
         connectionStatus.classList.add("is-running");
       })
       .catch(() => {
-        statusFields.forEach((field) => {
-          document.querySelector(`[data-status="${field}"]`).textContent = "Unavailable";
-        });
-
+        labContext.textContent = "Kubernetes Lab — Namespace: unavailable";
+        renderDeployment([{ label: "Deployment data", value: "Unavailable" }]);
+        renderMilestones([]);
         connectionText.textContent = "API unavailable";
         connectionStatus.classList.add("is-error");
       });
