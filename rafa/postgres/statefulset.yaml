@@ -1,0 +1,81 @@
+# StatefulSet mantiene una identidad estable para PostgreSQL y vuelve a usar su PVC
+# cuando el Pod se recrea.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rafael-postgres
+  namespace: rafa-lab
+spec:
+  # Este nombre debe coincidir con el Service headless que publica la base de datos.
+  serviceName: rafael-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rafael-postgres
+  template:
+    metadata:
+      labels:
+        app: rafael-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: rafael-postgres:1.0
+
+          # La imagen se carga manualmente en Minikube y no se busca en un registro.
+          imagePullPolicy: Never
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: rafa_lab
+            - name: POSTGRES_USER
+              value: postgres
+
+            # La contraseña se obtiene del Secret creado manualmente antes del despliegue.
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rafael-postgres-credentials
+                  key: password
+
+            # El subdirectorio evita que initdb encuentre archivos ajenos a PostgreSQL
+            # en la raíz del volumen y mantiene los datos dentro del PVC.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+          # Kubernetes enviará tráfico solamente cuando PostgreSQL acepte conexiones.
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+
+          # Estos valores son moderados para un laboratorio local de una sola réplica.
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+  # Cada réplica recibe su propio PVC. El StatefulSet conserva este volumen al
+  # recrear el Pod, por lo que los usuarios registrados no dependen del contenedor.
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
