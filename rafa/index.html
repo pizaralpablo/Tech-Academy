@@ -230,6 +230,114 @@
       border-bottom: 1px solid #334155;
     }
 
+    .user-registration {
+      margin-top: 30px;
+      padding-top: 28px;
+      border-top: 1px solid #475569;
+      text-align: left;
+    }
+
+    .registration-heading {
+      margin-bottom: 18px;
+    }
+
+    .registration-heading h3 {
+      margin-bottom: 6px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .registration-description {
+      color: #94a3b8;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .registration-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .form-field {
+      min-width: 0;
+    }
+
+    .form-field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .form-field input {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      color: #f8fafc;
+      background: #172033;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 0.94rem;
+    }
+
+    .form-field input:focus {
+      border-color: #38bdf8;
+      outline: 2px solid rgba(56, 189, 248, 0.25);
+      outline-offset: 1px;
+    }
+
+    .registration-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .register-button {
+      min-height: 42px;
+      padding: 10px 18px;
+      color: #082f49;
+      background: #38bdf8;
+      border: 0;
+      border-radius: 6px;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .register-button:hover:not(:disabled) {
+      background: #7dd3fc;
+    }
+
+    .register-button:focus-visible {
+      outline: 2px solid #f8fafc;
+      outline-offset: 2px;
+    }
+
+    .register-button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .registration-message {
+      min-height: 1.5em;
+      color: #94a3b8;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .registration-message.is-success {
+      color: #4ade80;
+    }
+
+    .registration-message.is-error {
+      color: #f87171;
+    }
+
     @media (max-width: 560px) {
       .card {
         padding: 40px 24px 28px;
@@ -261,6 +369,19 @@
 
       .progress-state {
         grid-column: 2;
+      }
+
+      .registration-form {
+        grid-template-columns: 1fr;
+      }
+
+      .registration-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .register-button {
+        width: 100%;
       }
     }
   </style>
@@ -313,6 +434,49 @@
         <p class="progress-empty">Loading course milestones...</p>
       </div>
     </section>
+
+    <section class="user-registration" aria-labelledby="registration-title">
+      <div class="registration-heading">
+        <h3 id="registration-title">User Registration</h3>
+        <p class="registration-description">
+          Register a user in the PostgreSQL database for Kubernetes Task 2.
+        </p>
+      </div>
+
+      <form class="registration-form" id="registration-form">
+        <div class="form-field">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            minlength="3"
+            maxlength="80"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <div class="registration-actions">
+          <button class="register-button" id="register-button" type="submit">
+            Register user
+          </button>
+          <p class="registration-message" id="registration-message" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
   </main>
 
   <script>
@@ -323,6 +487,11 @@
     const deploymentGrid = document.getElementById("deployment-grid");
     const progressList = document.getElementById("progress-list");
     const progressSummary = document.getElementById("progress-summary");
+    const registrationForm = document.getElementById("registration-form");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const registerButton = document.getElementById("register-button");
+    const registrationMessage = document.getElementById("registration-message");
 
     function renderDeployment(items) {
       const fragment = document.createDocumentFragment();
@@ -383,6 +552,64 @@
 
       progressList.replaceChildren(fragment);
     }
+
+    function showRegistrationMessage(message, type = "") {
+      registrationMessage.textContent = message;
+      registrationMessage.className = "registration-message";
+
+      if (type) {
+        registrationMessage.classList.add(`is-${type}`);
+      }
+    }
+
+    // Paso 1: interceptamos el formulario para enviar los datos como JSON sin recargar la pagina.
+    registrationForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      if (!registrationForm.reportValidity()) {
+        showRegistrationMessage("Revisa los datos ingresados antes de continuar.", "error");
+        return;
+      }
+
+      registerButton.disabled = true;
+      registerButton.textContent = "Registering...";
+      showRegistrationMessage("Registering user...");
+
+      try {
+        // Paso 2: usamos una ruta relativa para que funcione igual en local y en Kubernetes.
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: usernameInput.value,
+            password: passwordInput.value,
+          }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        // Paso 3: cada codigo esperado recibe un mensaje claro sin mostrar datos sensibles.
+        if (response.status === 201) {
+          showRegistrationMessage(data.message || "Usuario registrado correctamente.", "success");
+          usernameInput.value = "";
+        } else if (response.status === 409) {
+          showRegistrationMessage(data.error || "El username ya esta registrado.", "error");
+        } else if (response.status === 400) {
+          showRegistrationMessage(data.error || "Los datos ingresados no son validos.", "error");
+        } else {
+          showRegistrationMessage("No fue posible registrar el usuario. Intenta nuevamente.", "error");
+        }
+      } catch (error) {
+        showRegistrationMessage("No se pudo conectar con el servidor. Intenta nuevamente.", "error");
+      } finally {
+        // Paso 4: la contrasena se limpia siempre y el boton vuelve a quedar disponible.
+        passwordInput.value = "";
+        registerButton.disabled = false;
+        registerButton.textContent = "Register user";
+      }
+    });
 
     // La interfaz obtiene estos datos de Express para confirmar que la API responde.
     fetch("/api/status")
