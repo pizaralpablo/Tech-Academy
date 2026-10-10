@@ -1,0 +1,17 @@
+# Este Service ofrece un nombre DNS estable para que la aplicación encuentre PostgreSQL.
+apiVersion: v1
+kind: Service
+metadata:
+  name: rafael-postgres
+  namespace: rafa-lab
+spec:
+  # Un Service headless sigue siendo de tipo ClusterIP, pero clusterIP: None indica
+  # que Kubernetes publica directamente las direcciones de los Pods en el DNS.
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: rafael-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres

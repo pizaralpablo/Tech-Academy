@@ -38,11 +38,28 @@ spec:
 
         # Este será el contenedor que ejecutará nuestra aplicación.
         - name: rafael-web
-          image: rafael-web-node:1.1
+          image: rafael-web-node:1.2
 
           # Le indicamos a Kubernetes que use la imagen que ya cargamos en Minikube.
           # Así evitamos que intente descargar nuestra imagen desde un registro externo.
           imagePullPolicy: Never
+
+          # La aplicación usa el nombre DNS del Service de PostgreSQL. Los datos
+          # públicos se declaran aquí y la contraseña se obtiene desde el Secret.
+          env:
+            - name: PGHOST
+              value: rafael-postgres
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: rafa_lab
+            - name: PGUSER
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rafael-postgres-credentials
+                  key: password
 
           # Reservamos los recursos básicos del contenedor y limitamos su consumo máximo.
           resources:
@@ -68,7 +85,7 @@ spec:
 #        ↓
 #Pod
 # └── container: rafael-web
-#      ├── image: rafael-web-node:1.1
+#      ├── image: rafael-web-node:1.2
 #      ├── no buscar la imagen afuera
 #      └── aplicación escucha en :3000
 
