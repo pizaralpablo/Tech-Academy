@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gengar-app
+  labels:
+    app: gengar-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gengar-app
+  template:
+    metadata:
+      labels:
+        app: gengar-app
+    spec:
+      containers:
+        - name: gengar-app
+          image: gengar-app:latest
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
