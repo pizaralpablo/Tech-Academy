@@ -15,6 +15,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
   </head>
   <body>
     <main class="page-shell">
@@ -28,7 +29,13 @@
           </span>
           Luis O<span> / docker homework</span>
         </a>
-        <span class="server-status"><i></i> My first container is live</span>
+        <div class="nav-actions">
+          <span class="server-status"><i></i> My first container is live</span>
+          <button class="account-trigger" id="open-auth" type="button" aria-haspopup="dialog" aria-controls="auth-modal">
+            <span class="account-trigger-icon" aria-hidden="true">↗</span>
+            Sign in / Register
+          </button>
+        </div>
       </nav>
 
       <section class="hero" id="top">
@@ -78,6 +85,49 @@
             <h3>Deployed locally</h3>
             <p>I exposed the server to my browser, turning a local image into a working web experience.</p>
           </article>
+        </div>
+      </section>
+
+      <section class="auth-modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="account-heading" hidden>
+        <div class="auth-modal-card">
+          <button class="modal-close" id="close-auth" type="button" aria-label="Close account dialog">×</button>
+          <div class="section-heading">
+            <p class="eyebrow"><span></span> Account access</p>
+            <h2 id="account-heading">Continue your container journey.</h2>
+            <p class="section-intro">Sign in or create an account. Your credentials will be handled by the application API.</p>
+          </div>
+
+          <div class="auth-card">
+          <div class="auth-tabs" role="tablist" aria-label="Account actions">
+            <button class="auth-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="login-panel" id="login-tab" data-auth-tab="login">Sign in</button>
+            <button class="auth-tab" type="button" role="tab" aria-selected="false" aria-controls="register-panel" id="register-tab" data-auth-tab="register">Create account</button>
+          </div>
+
+          <div class="auth-panel is-active" id="login-panel" role="tabpanel" aria-labelledby="login-tab" data-auth-panel="login">
+            <form class="auth-form" id="login-form" novalidate>
+              <label for="login-username">Username</label>
+              <input id="login-username" name="username" type="text" autocomplete="username" minlength="3" required />
+              <label for="login-password">Password</label>
+              <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+              <button class="button button-primary form-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+              <p class="form-message" id="login-message" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <div class="auth-panel" id="register-panel" role="tabpanel" aria-labelledby="register-tab" data-auth-panel="register" hidden>
+            <form class="auth-form" id="register-form" novalidate>
+              <label for="register-username">Username</label>
+              <input id="register-username" name="username" type="text" autocomplete="username" minlength="3" maxlength="32" required />
+              <label for="register-password">Password</label>
+              <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="12" required aria-describedby="password-help" />
+              <p class="field-help" id="password-help">At least 12 characters, including uppercase, lowercase, number, and symbol.</p>
+              <label for="register-password-confirm">Confirm password</label>
+              <input id="register-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" required />
+              <button class="button button-primary form-submit" type="submit">Create account <span aria-hidden="true">→</span></button>
+              <p class="form-message" id="register-message" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+          </div>
         </div>
       </section>
 
