@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mynamespacek8s
+---
+apiVersion: apps/v1
+kind: Deployment
+#Identidad y etiquetas para identificar el deployment
+metadata:
+  name: web-app-backend
+  namespace: mynamespacek8s
+  labels:
+    app: web-app-backend
+spec:
+  replicas: 4
+  #Selector para ser identificado
+  selector:
+    matchLabels:
+      app: web-app-backend
+  template:
+    #Etiquetas para identificar el Pod
+    metadata:
+      labels:
+        app: web-app-backend
+    spec:
+      containers:
+        - name: web-app-backend-container
+          image: auth-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+          # El numero de puerto debe matchear el del contenedor
+          - name: http
+            containerPort: 3000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          env:
+            - name: DB_HOST
+              value: web-app-db
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: POSTGRES_DB
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: POSTGRES_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: JWT_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-api
+  namespace: mynamespacek8s
+  labels: 
+    app: auth-api
+spec:
+  type: ClusterIP
+  selector:
+      app: web-app-backend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http  
