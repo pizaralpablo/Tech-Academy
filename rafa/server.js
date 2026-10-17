@@ -2,13 +2,18 @@
 const express = require("express");
 const path = require("path");
 const bcrypt = require("bcryptjs");
+const session = require("express-session");
+const connectPgSimple = require("connect-pg-simple");
 const { Pool } = require("pg");
+const { createAuthRouter, requireAuthenticatedPage } = require("./auth");
 
 const app = express();
+app.disable("x-powered-by");
 
 // Docker o Kubernetes pueden definir el puerto. Para uso local se utiliza 3000.
 const PORT = process.env.PORT || 3000;
 const BCRYPT_COST = 12;
+const SESSION_MAX_AGE_MS = 2 * 60 * 60 * 1000;
 
 // PostgreSQL toma la conexión únicamente de variables de entorno. De esta forma,
 // las credenciales no quedan escritas dentro del código ni de la imagen Docker.
@@ -30,6 +35,10 @@ pool.on("error", (error) => {
 // Express necesita este middleware para convertir cuerpos JSON en objetos.
 // El límite pequeño evita recibir cargas innecesariamente grandes en este formulario.
 app.use(express.json({ limit: "10kb" }));
+
+// Publicamos únicamente los recursos visuales del frontend. Al limitar la ruta a
+// /assets evitamos exponer server.js, package.json u otros archivos internos.
+app.use("/assets", express.static(path.join(__dirname, "assets"), { index: false }));
 
 const currentStatus = {
   runtime: "Node.js + Express",
@@ -74,6 +83,11 @@ const labStatus = {
       state: "Completed",
       summary: "PostgreSQL StatefulSet, ClusterIP Service, persistent storage and user registration.",
     },
+    {
+      title: "Kubernetes Task 3",
+      state: "Completed",
+      summary: "Static and dynamic persistent storage using PersistentVolumes, PersistentVolumeClaims and StorageClasses.",
+    },
   ],
 };
 
@@ -81,6 +95,70 @@ const labStatus = {
 app.get("/api/status", (req, res) => {
   res.json(labStatus);
 });
+
+function readRequiredSecret(name) {
+  const value = process.env[name];
+
+  if (typeof value !== "string" || value.length < 32) {
+    throw new Error(`${name} debe contener al menos 32 caracteres.`);
+  }
+
+  return value;
+}
+
+const sessionSecret = readRequiredSecret("SESSION_SECRET");
+const rateLimitSecret = readRequiredSecret("RATE_LIMIT_SECRET");
+const secureCookies = process.env.SESSION_COOKIE_SECURE === "true";
+const cookieName = secureCookies ? "__Host-rafa.sid" : "rafa.sid";
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: "lax",
+  secure: secureCookies,
+  path: "/",
+  maxAge: SESSION_MAX_AGE_MS,
+};
+const clearCookieOptions = {
+  httpOnly: cookieOptions.httpOnly,
+  sameSite: cookieOptions.sameSite,
+  secure: cookieOptions.secure,
+  path: cookieOptions.path,
+};
+
+// Solo confiamos en cabeceras del proxy cuando el entorno lo solicita. En Minikube
+// con HTTP queda desactivado; un futuro Ingress HTTPS deberá habilitarlo.
+if (process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
+
+const PostgresSessionStore = connectPgSimple(session);
+const sessionStore = new PostgresSessionStore({
+  pool,
+  tableName: "user_sessions",
+  createTableIfMissing: false,
+  pruneSessionInterval: 15 * 60,
+  errorLog: (error) => {
+    console.error("Error en el almacén de sesiones. Código:", error.code || "UNKNOWN");
+  },
+});
+
+// La cookie guarda únicamente un identificador firmado. Los datos de sesión quedan
+// en PostgreSQL y por eso cualquiera de los dos Pods puede atender la siguiente petición.
+app.use(session({
+  name: cookieName,
+  secret: sessionSecret,
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  rolling: true,
+  cookie: cookieOptions,
+}));
+
+app.use("/api/auth", createAuthRouter({
+  pool,
+  rateLimitSecret,
+  cookieName,
+  cookieOptions: clearCookieOptions,
+}));
 
 const databaseUnavailableCodes = new Set([
   "ECONNREFUSED",
@@ -173,6 +251,12 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// El HTML del dashboard se entrega únicamente cuando existe una sesión autenticada.
+app.get("/dashboard", requireAuthenticatedPage, (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.sendFile(path.join(__dirname, "dashboard.html"));
+});
+
 // Los errores al leer JSON se responden de forma uniforme, sin devolver trazas
 // internas de Express ni detalles del servidor al cliente.
 app.use((error, req, res, next) => {
@@ -182,6 +266,11 @@ app.use((error, req, res, next) => {
 
   if (error.type === "entity.too.large") {
     return res.status(413).json({ error: "El cuerpo de la solicitud es demasiado grande." });
+  }
+
+  if (isDatabaseUnavailable(error)) {
+    console.error("PostgreSQL no está disponible. Código:", error.code);
+    return res.status(503).json({ error: "El servicio no está disponible temporalmente." });
   }
 
   console.error("Error no controlado en Express:", error.code || "UNKNOWN");
