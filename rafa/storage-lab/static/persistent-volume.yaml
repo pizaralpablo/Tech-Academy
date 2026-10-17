@@ -1,0 +1,25 @@
+# Un PersistentVolume representa almacenamiento disponible para todo el clúster.
+# No lleva namespace porque los PV son recursos globales de Kubernetes.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rafa-storage-lab-static-pv
+spec:
+  # Ofrecemos una capacidad pequeña y suficiente para este ejercicio aislado.
+  capacity:
+    storage: 256Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+
+  # Retain conserva los datos cuando se elimina el PVC, pero no crea un respaldo.
+  persistentVolumeReclaimPolicy: Retain
+
+  # Esta clase exclusiva evita depender de la StorageClass predeterminada y evita
+  # que el PVC del laboratorio intente usar el almacenamiento de PostgreSQL.
+  storageClassName: rafa-storage-lab-static
+
+  # Minikube creará este directorio dentro de su nodo, no en Windows directamente.
+  hostPath:
+    path: /data/rafa-storage-lab-static
+    type: DirectoryOrCreate
