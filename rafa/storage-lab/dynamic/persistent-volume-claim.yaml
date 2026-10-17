@@ -1,0 +1,15 @@
+# Este PVC pide almacenamiento a la StorageClass dinámica exclusiva del laboratorio.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rafa-storage-lab-dynamic-pvc
+  namespace: rafa-lab
+spec:
+  # Kubernetes usará esta clase para crear un PV nuevo de forma automática.
+  storageClassName: rafa-storage-lab-dynamic
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi

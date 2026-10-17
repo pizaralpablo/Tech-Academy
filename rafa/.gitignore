@@ -1,0 +1,4 @@
+# Las dependencias instaladas por npm pueden reconstruirse con package.json
+# y package-lock.json, por lo que no deben guardarse dentro del repositorio.
+# Ignorarlas evita archivos innecesarios y diferencias entre equipos.
+node_modules/
