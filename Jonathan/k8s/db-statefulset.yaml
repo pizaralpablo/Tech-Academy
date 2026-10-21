@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jonathan-db
+spec:
+  serviceName: jonathan-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jonathan-db
+  template:
+    metadata:
+      labels:
+        app: jonathan-db
+    spec:
+      containers:
+        - name: jonathan-db
+          image: jonathan-db:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
