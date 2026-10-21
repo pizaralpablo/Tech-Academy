@@ -1,0 +1,7 @@
+
+editar o crear una imagen nueva para el web app (utilizado por el pod deployment) que pueda conectar a la base de datos que ustedes elijan ejemplo postgres, tambien que se pueda crear y guardar datos ejemplo crear users y que se guarde en la db (usando el storage creado en tarea 3).
+una vez que tengan la imagen nueva deben crear un secret que me guarde el password y username de la db y pasarselos al pod de web app para poder conectarse a la db creada en el statefuset, ademas crear un ingress que sea http que podamos llegar al service y luego al web server.
+
+pueden tomar como referencia lo que esta creado en mi folder de la clase.
+
+https://github.com/pizaralpablo/Tech-Academy/tree/main/josealpizar/Kubernetes%20module/kubernetes/ejemplo
