@@ -1,0 +1,7 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: tarea-dinamico # Nombre usado por la PVC dinamica del ejemplo.
+provisioner: k8s.io/minikube-hostpath # Ejemplo para Minikube / entorno local
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

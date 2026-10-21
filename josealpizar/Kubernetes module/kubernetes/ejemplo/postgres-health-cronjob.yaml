@@ -1,0 +1,66 @@
+# Usa la API batch para crear tareas programadas.
+apiVersion: batch/v1
+kind: CronJob # Ejecuta periodicamente el chequeo de disponibilidad de PostgreSQL.
+metadata:
+# Identifica el CronJob en el namespace de la base de datos.
+  name: tarea-postgres-health-check # Nombre del chequeo de PostgreSQL del ejemplo.
+  namespace: tarea # Namespace donde estan el Service, Secret y ConfigMap de PostgreSQL.
+spec:
+  schedule: "*/2 * * * *" # Ejecuta el chequeo cada dos minutos.
+  concurrencyPolicy: Forbid # No inicia otra comprobacion si la anterior sigue activa.
+  successfulJobsHistoryLimit: 3 # Conserva los ultimos tres Jobs exitosos.
+  failedJobsHistoryLimit: 3 # Conserva los ultimos tres Jobs fallidos.
+  jobTemplate:
+    # Define el Job temporal que se crea en cada ejecucion programada.
+    spec:
+      backoffLimit: 1 # Reintenta una vez si el contenedor del Job falla.
+      activeDeadlineSeconds: 60 # Termina la comprobacion si supera un minuto.
+      ttlSecondsAfterFinished: 300 # Elimina el Job terminado despues de cinco minutos.
+      template:
+        # Define el Pod que ejecutara el script.
+        metadata:
+          labels:
+            app: postgres-health-check # Etiqueta para identificar estos Pods.
+        spec:
+          restartPolicy: Never # Deja que el Job gestione reintentos, no reinicia el Pod.
+          containers:
+            - name: postgres-health-check
+              image: postgres:16-alpine # Incluye pg_isready para comprobar PostgreSQL.
+              imagePullPolicy: IfNotPresent # Descarga la imagen solo si no esta en el nodo.
+              command: ["sh", "/scripts/check-db.sh"] # Ejecuta el script montado desde el ConfigMap.
+              env:
+                - name: PGHOST
+                  value: tarea-postgres # Nombre DNS del Service PostgreSQL en este namespace.
+                - name: PGPORT
+                  value: "5432" # Puerto TCP de PostgreSQL.
+                - name: PGDATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      name: tarea-postgres-credentials # Lee el Secret de credenciales.
+                      key: POSTGRES_DB # Inyecta el nombre de la base de datos.
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: tarea-postgres-credentials # Lee el mismo Secret.
+                      key: POSTGRES_USER # Inyecta el usuario de PostgreSQL.
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: tarea-postgres-credentials # Lee el mismo Secret.
+                      key: POSTGRES_PASSWORD # Inyecta la password sin incluirla en el manifiesto del Pod.
+              resources:
+                requests:
+                  cpu: 10m # Solicita una centesima de CPU.
+                  memory: 16Mi # Solicita 16 MiB de memoria.
+                limits:
+                  cpu: 50m # Limita el uso a cinco centesimas de CPU.
+                  memory: 32Mi # Limita la memoria a 32 MiB.
+              volumeMounts:
+                - name: check-script
+                  mountPath: /scripts # Expone el script dentro del contenedor.
+                  readOnly: true # Impide que el contenedor modifique el script.
+          volumes:
+            - name: check-script
+              configMap:
+                name: tarea-postgres-health-check-script # Usa el ConfigMap que contiene check-db.sh.
+                defaultMode: 0444 # Monta los archivos como solo lectura.

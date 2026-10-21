@@ -17,11 +17,31 @@ spec: # Configuracion deseada que Kubernetes intentara mantener.
     spec: # Configuracion interna de cada Pod.
       containers: # Lista de contenedores que se ejecutaran dentro del Pod.
         - name: tarea # Nombre del contenedor dentro del Pod.
-          image: nginx:latest # Imagen y etiqueta que Kubernetes usara para crear el contenedor.
-          imagePullPolicy: Never # No descarga la imagen; esta debe existir ya en el nodo de Kubernetes.
+          image: k8s-lab-node:latest # Imagen Node.js que sirve la web y las rutas API.
+          imagePullPolicy: Never # Usa la imagen local cargada en Minikube y no intenta descargarla.
           ports: # Puertos que el contenedor declara como usados.
             - name: http # Nombre descriptivo del puerto, util para referenciarlo desde un Service.
-              containerPort: 80 # Puerto en el que escucha Nginx dentro del contenedor.
+              containerPort: 8080 # Puerto donde el servidor Node escucha HTTP y API.
+          env: # Configuracion para que Node se conecte a PostgreSQL.
+            - name: DB_HOST # DNS del Service headless de PostgreSQL en el namespace tarea.
+              value: tarea-postgres
+            - name: DB_PORT # Puerto TCP de PostgreSQL.
+              value: "5432"
+            - name: DB_NAME # Nombre de base de datos obtenido del Secret.
+              valueFrom:
+                secretKeyRef:
+                  name: tarea-postgres-credentials
+                  key: POSTGRES_DB
+            - name: DB_USER # Usuario de base de datos obtenido del Secret.
+              valueFrom:
+                secretKeyRef:
+                  name: tarea-postgres-credentials
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD # Password obtenida del Secret.
+              valueFrom:
+                secretKeyRef:
+                  name: tarea-postgres-credentials
+                  key: POSTGRES_PASSWORD
           resources: # Recursos de CPU y memoria solicitados y limitados para el contenedor.
             requests: # Cantidad minima reservada y usada por Kubernetes al ubicar el Pod.
               cpu: 100m # Solicita 0.1 CPU, es decir, una decima parte de un nucleo.

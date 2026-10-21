@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+# Identifica la PVC en el mismo namespace que PostgreSQL.
+  name: tarea-pvc # Nombre montado por el StatefulSet.
+  namespace: tarea # Los Pods solo pueden montar PVCs de su propio namespace.
+spec:
+  # Vincula esta PVC directamente con el PV declarado en test-pv.yaml.
+  volumeName: tarea-pv # Solicita especificamente el PV tarea-pv.
+  accessModes:
+    - ReadWriteOnce # Coincide con el modo de acceso del PV.
+  resources:
+    requests:
+      storage: 1Gi # Solicita la capacidad completa del PV.
+  storageClassName: manual # Debe coincidir con la clase del PV estatico.

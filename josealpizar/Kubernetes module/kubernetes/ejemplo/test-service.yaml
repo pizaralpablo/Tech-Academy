@@ -1,0 +1,15 @@
+# Usa la API base de Kubernetes para crear un Service.
+apiVersion: v1
+kind: Service # Da un nombre DNS estable al StatefulSet PostgreSQL.
+metadata:
+# Identifica el Service en el mismo namespace que la base de datos.
+  name: tarea-postgres # El StatefulSet usa este nombre en serviceName.
+  namespace: tarea # Mantiene el acceso interno dentro del namespace del ejemplo.
+spec:
+  clusterIP: None # Crea un Service headless para la identidad estable del StatefulSet.
+  selector:
+    app: tarea-postgres # Envia conexiones a los Pods con esta etiqueta.
+  ports:
+    - name: postgres
+      port: 5432 # Puerto DNS estable que usan los clientes de PostgreSQL.
+      targetPort: 5432 # Puerto PostgreSQL dentro del Pod.

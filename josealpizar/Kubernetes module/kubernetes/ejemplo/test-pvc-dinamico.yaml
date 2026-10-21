@@ -1,0 +1,15 @@
+# Usa la API base de Kubernetes para solicitar almacenamiento persistente.
+apiVersion: v1
+kind: PersistentVolumeClaim # Reclama almacenamiento para PostgreSQL.
+metadata:
+# Identifica la solicitud de almacenamiento en el namespace de la base de datos.
+  name: tarea-pvc-dinamico # PVC adicional para mostrar aprovisionamiento dinamico.
+  namespace: tarea # Los Pods solo pueden montar PVCs de su propio namespace.
+spec:
+  # Define el modo de acceso, clase y capacidad solicitada.
+  accessModes:
+    - ReadWriteOnce # Permite montar el volumen en modo lectura-escritura desde un nodo.
+  storageClassName: tarea-dinamico # Usa la StorageClass declarada en este folder.
+  resources:
+    requests:
+      storage: 2Gi # Solicita un volumen de dos gibibytes.
