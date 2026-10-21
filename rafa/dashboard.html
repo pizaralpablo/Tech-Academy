@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Dashboard privado del laboratorio Kubernetes de RAFA Tech Academy.">
+  <title>Dashboard | RAFA // Tech Academy</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/dashboard.js" defer></script>
+</head>
+
+<body class="dashboard-page">
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="RAFA Tech Academy, inicio">
+        <span class="brand-name"><strong>RAFA //</strong> TECH ACADEMY</span>
+        <span class="brand-subtitle">Kubernetes Lab Environment</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Navegación principal">
+        <a href="/">Inicio</a>
+        <a class="is-active" href="/dashboard">Dashboard</a>
+        <button class="nav-logout" id="logout-button" type="button">Cerrar sesión</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dashboard-main shell">
+    <div class="authenticated-banner">
+      <span class="signal-dot" aria-hidden="true"></span>
+      <span>Sesión autenticada</span>
+      <strong id="authenticated-username">Consultando usuario...</strong>
+      <span class="form-message" id="logout-message" role="status" aria-live="polite"></span>
+    </div>
+
+    <section class="dashboard-hero" aria-labelledby="dashboard-title">
+      <div>
+        <p class="eyebrow"><span class="signal-square" aria-hidden="true"></span> Mission Control</p>
+        <h1 id="dashboard-title">Kubernetes Dashboard</h1>
+        <p class="hero-copy">Estado declarado del entorno y progreso del laboratorio.</p>
+      </div>
+
+      <aside class="system-console" aria-label="Estado general del sistema">
+        <div class="system-console-top">
+          <span id="system-label">Checking system</span>
+          <span class="heartbeat" aria-hidden="true">⌁</span>
+        </div>
+        <dl>
+          <div><dt>Cluster</dt><dd>No disponible</dd></div>
+          <div><dt>Namespace</dt><dd id="namespace-value">Consultando...</dd></div>
+          <div><dt>API</dt><dd id="api-value">Conectando...</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="summary-grid" aria-label="Resumen del despliegue">
+      <article class="summary-card">
+        <div class="line-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="m3 8 9 5 9-5"/><path d="M3 8v8l9 5 9-5V8"/></svg>
+        </div>
+        <div><span class="summary-label">Runtime</span><strong id="runtime-value">Consultando...</strong></div>
+        <span class="summary-state" id="runtime-state">Pendiente</span>
+      </article>
+
+      <article class="summary-card">
+        <div class="line-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="8.5" y="14" width="7" height="7" rx="1"/><path d="M6.5 10v2h11v-2M12 12v2"/></svg>
+        </div>
+        <div><span class="summary-label">Web Application</span><strong id="replicas-value">Consultando...</strong></div>
+        <span class="summary-state" id="replicas-state">Pendiente</span>
+      </article>
+
+      <article class="summary-card">
+        <div class="line-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><path d="M7 4v16M17 4v16"/></svg>
+        </div>
+        <div><span class="summary-label">Service</span><strong id="service-value">Consultando...</strong></div>
+        <span class="summary-state" id="service-state">Pendiente</span>
+      </article>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="progress-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Training Log</p>
+          <h2 id="progress-title">Course Progress</h2>
+          <p>Avances reportados por la API del laboratorio.</p>
+        </div>
+        <span class="progress-counter" id="progress-summary">Consultando...</span>
+      </div>
+
+      <div class="mission-list" id="progress-list" aria-live="polite">
+        <p class="empty-state">Cargando hitos del curso...</p>
+      </div>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="deployment-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Cluster Readout</p>
+          <h2 id="deployment-title">Deployment Status</h2>
+          <p>Configuración declarada por <code>/api/status</code>.</p>
+        </div>
+        <div class="connection-state" id="connection-state" role="status" aria-live="polite">
+          <span class="signal-dot" aria-hidden="true"></span>
+          <span id="connection-text">Checking API...</span>
+        </div>
+      </div>
+
+      <div class="status-table" role="table" aria-label="Configuración del despliegue">
+        <div class="status-row status-table-head" role="row">
+          <span role="columnheader">Resource</span>
+          <span role="columnheader">Configured value</span>
+        </div>
+        <div id="deployment-list" aria-live="polite">
+          <div class="status-row" role="row"><span>Deployment data</span><strong>Loading...</strong></div>
+        </div>
+      </div>
+
+      <p class="data-limitation">
+        La API actual no expone métricas en vivo de PostgreSQL, Pods o PVC. Este dashboard
+        no infiere estados operativos que el backend no pueda confirmar.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <div><strong>RAFA // TECH ACADEMY</strong><span>Kubernetes Lab Environment</span></div>
+      <p>Explore <span>//</span> Learn <span>//</span> Build <span>//</span> Deploy</p>
+    </div>
+  </footer>
+</body>
+</html>

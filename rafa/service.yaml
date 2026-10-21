@@ -9,6 +9,9 @@ kind: Service
 metadata:
   name: rafael-web-service
 
+  # Este Service pertenecerá al mismo Namespace que los Pods de la aplicación.
+  namespace: rafa-lab
+
 # Aquí definimos cómo funcionará nuestro Service.
 spec:
 

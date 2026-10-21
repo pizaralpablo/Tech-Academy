@@ -9,6 +9,9 @@ kind: Deployment
 metadata:
   name: rafael-web
 
+  # Este Deployment pertenecerá únicamente al Namespace rafa-lab.
+  namespace: rafa-lab
+
 # Aquí describimos el estado que queremos que Kubernetes mantenga para este Deployment.
 spec:
 
@@ -35,11 +38,57 @@ spec:
 
         # Este será el contenedor que ejecutará nuestra aplicación.
         - name: rafael-web
-          image: rafael-web-node:1.0
+          image: rafael-web-node:1.6
 
           # Le indicamos a Kubernetes que use la imagen que ya cargamos en Minikube.
           # Así evitamos que intente descargar nuestra imagen desde un registro externo.
           imagePullPolicy: Never
+
+          # La aplicación usa el nombre DNS del Service de PostgreSQL. Los datos
+          # públicos se declaran aquí y la contraseña se obtiene desde el Secret.
+          env:
+            - name: PGHOST
+              value: rafael-postgres
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: rafa_lab
+            - name: PGUSER
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rafael-postgres-credentials
+                  key: password
+
+            # Ambos Pods usan los mismos secretos para firmar sesiones y anonimizar
+            # las claves del límite de intentos. Sus valores nunca se guardan en Git.
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: rafael-web-auth
+                  key: session-secret
+            - name: RATE_LIMIT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: rafael-web-auth
+                  key: rate-limit-secret
+
+            # Minikube se accede actualmente por HTTP. En un entorno HTTPS estas
+            # opciones deben cambiar a "true" y confiar únicamente en el Ingress.
+            - name: SESSION_COOKIE_SECURE
+              value: "false"
+            - name: TRUST_PROXY
+              value: "false"
+
+          # Reservamos los recursos básicos del contenedor y limitamos su consumo máximo.
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
 
           # Indicamos que nuestra aplicación escucha en el puerto 3000 dentro del contenedor.
           # Esto describe el puerto de la aplicación; todavía no la expone fuera del Pod.
@@ -56,7 +105,7 @@ spec:
 #        ↓
 #Pod
 # └── container: rafael-web
-#      ├── image: rafael-web-node:1.0
+#      ├── image: rafael-web-node:1.6
 #      ├── no buscar la imagen afuera
 #      └── aplicación escucha en :3000
 

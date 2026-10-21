@@ -14,9 +14,11 @@ COPY package*.json ./
 # En nuestro caso, aquí se instalará Express y todo lo que necesita para funcionar.
 RUN npm ci
 
-# Copiamos ahora el código de nuestra aplicación dentro de /app.
-# Aquí entran nuestro servidor Express y la página que este servidor va a entregar.
-COPY server.js index.html ./
+# Copiamos el servidor, el módulo de autenticación y las páginas del navegador.
+COPY server.js auth.js index.html dashboard.html ./
+
+# Los estilos, scripts e imágenes quedan agrupados en su directorio público.
+COPY assets ./assets
 
 # Documentamos que nuestra aplicación Node escucha en el puerto 3000 dentro del contenedor.
 # EXPOSE no publica el puerto hacia nuestra PC; eso lo haremos después con docker run -p.

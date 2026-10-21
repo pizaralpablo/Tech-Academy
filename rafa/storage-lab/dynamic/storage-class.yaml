@@ -1,0 +1,15 @@
+# Esta StorageClass enseña a Kubernetes cómo crear volúmenes bajo demanda en Minikube.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rafa-storage-lab-dynamic
+
+# Este es el provisionador local incluido por Minikube para almacenamiento hostPath.
+provisioner: k8s.io/minikube-hostpath
+
+# Delete elimina el volumen aprovisionado cuando se borra su PVC. Es práctico para
+# un laboratorio temporal, pero también elimina sus datos y no debe usarse a ciegas.
+reclaimPolicy: Delete
+
+# Immediate solicita el volumen al crear el PVC, sin esperar a que exista un Pod.
+volumeBindingMode: Immediate

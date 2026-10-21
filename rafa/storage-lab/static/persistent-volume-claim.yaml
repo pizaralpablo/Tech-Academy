@@ -1,0 +1,18 @@
+# El PVC solicita el espacio ofrecido por el PV estático del laboratorio.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rafa-storage-lab-static-pvc
+  namespace: rafa-lab
+spec:
+  # Debe coincidir exactamente con la clase declarada en el PV manual.
+  storageClassName: rafa-storage-lab-static
+
+  # volumeName hace explícito qué PV debe utilizar este ejemplo estático.
+  volumeName: rafa-storage-lab-static-pv
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 256Mi
