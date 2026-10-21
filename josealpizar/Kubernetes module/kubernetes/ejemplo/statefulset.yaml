@@ -1,0 +1,61 @@
+apiVersion: apps/v1 # Version de la API de Kubernetes que define StatefulSets.
+kind: StatefulSet # Indica que este recurso administra Pods con identidad estable.
+# Base de datos PostgreSQL con identidad estable, credenciales y datos persistentes en una PVC estatica.
+# Los metadatos identifican al StatefulSet dentro del cluster.
+metadata:
+  name: tarea-postgres # Nombre del StatefulSet.
+  namespace: tarea # Namespace donde se crea; debe existir previamente.
+  labels: # Etiquetas asignadas al propio StatefulSet.
+    app: tarea-postgres # Etiqueta descriptiva de la aplicacion.
+spec: # Configuracion deseada que Kubernetes mantendra.
+  # Configura identidad estable, cantidad de replicas y selector de Pods.
+  serviceName: tarea-postgres # Nombre del Service headless que proporciona identidad de red estable a los Pods.
+  replicas: 1 # Numero de Pods que se desean mantener.
+  selector: # Regla que relaciona este StatefulSet con los Pods que administra.
+    matchLabels: # Selecciona Pods que tengan las etiquetas indicadas.
+      app: tarea-postgres # Debe coincidir con las etiquetas definidas en la plantilla del Pod.
+  template: # Plantilla utilizada para crear cada Pod del StatefulSet.
+    # Define las etiquetas y la configuracion de ejecucion de cada Pod.
+    metadata:
+      labels: # Etiquetas que llevaran los Pods creados.
+        app: tarea-postgres # Coincide con selector.matchLabels para que el StatefulSet administre estos Pods.
+    spec: # Configuracion de los contenedores dentro de cada Pod.
+      # Define el contenedor de PostgreSQL y sus recursos asignados.
+      containers: # Lista de contenedores que se ejecutan en el Pod.
+        - name: test # Nombre del contenedor dentro del Pod.
+          image: postgres:16-alpine # Imagen de PostgreSQL version 16 basada en Alpine Linux.
+          imagePullPolicy: IfNotPresent # Descarga la imagen solo si no existe ya en el nodo.
+          ports: # Puertos declarados por el contenedor.
+            - name: test # Nombre descriptivo del puerto del contenedor.
+              containerPort: 5432 # Puerto donde PostgreSQL acepta conexiones dentro del Pod.
+          env: # Variables de inicializacion de PostgreSQL.
+            - name: POSTGRES_DB # Nombre de la base de datos que se creara al inicializar el volumen.
+              valueFrom: # Obtiene el valor desde un Secret en vez de escribirlo aqui.
+                secretKeyRef: # Referencia a una clave concreta dentro de un Secret.
+                  name: tarea-postgres-credentials # Secret existente en el namespace tarea.
+                  key: POSTGRES_DB # Clave que proporciona el nombre de la base de datos.
+            - name: POSTGRES_USER # Usuario administrador inicial de PostgreSQL.
+              valueFrom: # Obtiene el valor desde un Secret.
+                secretKeyRef: # Referencia a una clave concreta dentro del Secret.
+                  name: tarea-postgres-credentials # Secret existente en el namespace tarea.
+                  key: POSTGRES_USER # Clave que proporciona el usuario.
+            - name: POSTGRES_PASSWORD # Password requerido para inicializar la base de datos.
+              valueFrom: # Obtiene el valor desde un Secret.
+                secretKeyRef: # Referencia a una clave concreta dentro del Secret.
+                  name: tarea-postgres-credentials # Secret existente en el namespace tarea.
+                  key: POSTGRES_PASSWORD # Clave que proporciona la password.
+          resources: # CPU y memoria solicitadas y limitadas para el contenedor.
+            requests: # Recursos que Kubernetes reserva al programar el Pod.
+              cpu: 250m # Solicita 0.25 CPU, un cuarto de nucleo.
+              memory: 256Mi # Solicita 256 mebibytes de memoria.
+            limits: # Limites maximos de recursos para el contenedor.
+              cpu: "1" # Permite usar como maximo un nucleo de CPU.
+              memory: 512Mi # Limita el uso de memoria a 512 mebibytes.
+          volumeMounts: # Indica los volumenes que se montan dentro de este contenedor.
+            - name: test-data # Nombre del volumen que debe coincidir con uno declarado en spec.volumes.
+              mountPath: /var/lib/postgresql/data # Ruta donde PostgreSQL guarda sus archivos de base de datos.
+      volumes: # Declara los volumenes disponibles para los contenedores de este Pod.
+        # PVC que conserva los datos de PostgreSQL fuera del contenedor.
+        - name: test-data # Nombre referenciado arriba en containers.volumeMounts.
+          persistentVolumeClaim: # Indica que este volumen usa una PersistentVolumeClaim existente.
+            claimName: tarea-pvc # PVC estatica enlazada al PV del ejemplo en el mismo namespace.

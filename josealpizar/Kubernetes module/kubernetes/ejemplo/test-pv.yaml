@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+# Los PV son recursos globales y no pertenecen a un namespace.
+  name: tarea-pv # Nombre que referencia la PVC estatica.
+spec:
+  capacity:
+    storage: 1Gi # Capacidad del volumen.
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce # Permite lectura y escritura desde un nodo a la vez.
+  persistentVolumeReclaimPolicy: Retain # Conserva los datos cuando se elimina la PVC.
+  storageClassName: manual # Vincula este PV con la PVC estatica del ejemplo.
+  hostPath:
+    path: /mnt/data/tarea-postgres # Ruta creada dentro del nodo Minikube para los datos.
+    type: DirectoryOrCreate # Crea la carpeta si aun no existe en el nodo.

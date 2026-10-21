@@ -1,0 +1,24 @@
+# Usa la API base de Kubernetes para crear un ConfigMap.
+apiVersion: v1
+kind: ConfigMap # Distribuye el script de comprobacion al Pod del CronJob.
+metadata:
+# Identifica el ConfigMap dentro del namespace de PostgreSQL.
+  name: tarea-postgres-health-check-script # Nombre montado por el CronJob.
+  namespace: tarea # El ConfigMap y el CronJob deben compartir namespace.
+data:
+  check-db.sh: | # Guarda el contenido siguiente como archivo de script.
+    # Se ejecuta con /bin/sh dentro de la imagen postgres:16-alpine.
+    #!/bin/sh
+    # Detiene el script ante errores, variables vacias o fallos en una tuberia.
+    set -eu
+
+    # Consulta PostgreSQL usando los valores inyectados desde el Secret.
+    if pg_isready -q -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d "$PGDATABASE"; then
+      # Registra que PostgreSQL esta aceptando conexiones.
+      echo "PostgreSQL is accepting connections at ${PGHOST}:${PGPORT}/${PGDATABASE}."
+    else
+      # Escribe el fallo en stderr para que aparezca claramente en los logs del Job.
+      echo "PostgreSQL is not ready at ${PGHOST}:${PGPORT}/${PGDATABASE}." >&2
+      # Marca el Job como fallido para que Kubernetes lo reporte.
+      exit 1
+    fi

@@ -1,0 +1,10 @@
+
+crear pvc y pv de forma manual (static storage) montarlo en el statefulset de la base de datos para ser consumido en el path definido por la base de datos (depende del db que usen)
+
+crear crear pvc dinamico y storage class para crear storage dinamico al statefulset se monta de igual manera que el manua/static 
+
+pueden usar cualqquiera de los dos para el statefull set, pero deben generar las dos formas para revisar(solo usan una forma)
+
+pueden revisar mis ejemplos en la carpeta bajo mi nombre donde esta todo lo visto en clase
+
+https://github.com/pizaralpablo/Tech-Academy/tree/main/josealpizar/Kubernetes%20module/kubernetes/ejemplo

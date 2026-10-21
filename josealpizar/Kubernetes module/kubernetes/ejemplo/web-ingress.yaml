@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1 # Usa la API estable de Kubernetes para Ingress.
+kind: Ingress # Declara una regla de entrada HTTP hacia un Service.
+# Identifica el Ingress que publica la web del ejemplo.
+metadata:
+  name: tarea-web # Nombre del recurso Ingress.
+  namespace: tarea # Namespace donde tambien viven el Service y los Pods web.
+spec:
+  ingressClassName: nginx # Entrega este Ingress al controlador NGINX.
+  rules:
+    - host: tarea.k8s-lab.local # Solo enruta solicitudes con este nombre de host.
+      http:
+        paths:
+          - path: / # Coincide desde la ruta raiz.
+            pathType: Prefix # Incluye / y cualquier subruta como /pagina.
+            backend:
+              service:
+                name: tarea # Reenvia las solicitudes al Service llamado tarea.
+                port:
+                  number: 8080 # Usa el puerto del Service, que apunta al puerto 80 de Nginx.
