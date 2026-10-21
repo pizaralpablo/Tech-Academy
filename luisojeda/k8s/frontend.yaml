@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mynamespacek8s
+---
+apiVersion: apps/v1
+kind: Deployment
+#Identidad y etiquetas para identificar el deployment
+metadata:
+  name: web-app-frontend
+  namespace: mynamespacek8s
+  labels:
+    app: web-app-frontend
+spec:
+  replicas: 4
+  #Selector para ser identificado
+  selector:
+    matchLabels:
+      app: web-app-frontend
+  template:
+    #Etiquetas para identificar el Pod
+    metadata:
+      labels:
+        app: web-app-frontend
+    spec:
+      containers:
+        - name: web-app-frontend-container
+          image: docker-homework:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+          # El numero de puerto debe matchear el del contenedor
+          - name: http
+            containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-frontend
+  namespace: mynamespacek8s
+  labels: 
+    app: web-app-frontend
+spec:
+  type: LoadBalancer
+  selector:
+      app: web-app-frontend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http  
