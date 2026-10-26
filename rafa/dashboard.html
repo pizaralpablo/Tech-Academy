@@ -37,18 +37,19 @@
       <div>
         <p class="eyebrow"><span class="signal-square" aria-hidden="true"></span> Mission Control</p>
         <h1 id="dashboard-title">Kubernetes Dashboard</h1>
-        <p class="hero-copy">Estado declarado del entorno y progreso del laboratorio.</p>
+        <p class="hero-copy">Arquitectura declarada, progreso académico y evidencia registrada del laboratorio.</p>
       </div>
 
       <aside class="system-console" aria-label="Estado general del sistema">
         <div class="system-console-top">
-          <span id="system-label">Checking system</span>
+          <span id="system-label">Loading configuration</span>
           <span class="heartbeat" aria-hidden="true">⌁</span>
         </div>
         <dl>
-          <div><dt>Cluster</dt><dd>No disponible</dd></div>
+          <div><dt>Environment</dt><dd>Minikube lab</dd></div>
           <div><dt>Namespace</dt><dd id="namespace-value">Consultando...</dd></div>
           <div><dt>API</dt><dd id="api-value">Conectando...</dd></div>
+          <div><dt>Data mode</dt><dd>Declared + recorded</dd></div>
         </dl>
       </aside>
     </section>
@@ -99,7 +100,7 @@
         <div>
           <p class="section-kicker">Cluster Readout</p>
           <h2 id="deployment-title">Deployment Status</h2>
-          <p>Configuración declarada por <code>/api/status</code>.</p>
+          <p>Configuración educativa declarada por <code>/api/status</code>; no es telemetría del clúster.</p>
         </div>
         <div class="connection-state" id="connection-state" role="status" aria-live="polite">
           <span class="signal-dot" aria-hidden="true"></span>
@@ -118,9 +119,24 @@
       </div>
 
       <p class="data-limitation">
-        La API actual no expone métricas en vivo de PostgreSQL, Pods o PVC. Este dashboard
-        no infiere estados operativos que el backend no pueda confirmar.
+        Los valores describen la arquitectura configurada. La API no consulta en vivo el estado
+        de Pods, PVC, Jobs ni PostgreSQL y este dashboard no los presenta como monitoreo operativo.
       </p>
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="evidence-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Validation Record</p>
+          <h2 id="evidence-title">Verified Lab Procedures</h2>
+          <p>Resultados registrados durante las pruebas del laboratorio, no métricas en tiempo real.</p>
+        </div>
+        <span class="recorded-badge">RECORDED EVIDENCE</span>
+      </div>
+
+      <div class="evidence-grid" id="evidence-list" aria-live="polite">
+        <p class="empty-state">Cargando evidencia registrada...</p>
+      </div>
     </section>
   </main>
 

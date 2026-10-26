@@ -44,8 +44,8 @@ const currentStatus = {
   runtime: "Node.js + Express",
   container: "Docker",
   orchestrator: "Kubernetes",
-  replicas: "2 Pods",
-  service: "LoadBalancer",
+  replicas: "3 Pods",
+  service: "ClusterIP + Ingress",
   status: "Running",
 };
 
@@ -61,11 +61,34 @@ const labStatus = {
     { label: "Container", value: currentStatus.container },
     { label: "Orchestrator", value: currentStatus.orchestrator },
     { label: "Namespace", value: "rafa-lab" },
-    { label: "Workload", value: "Deployment" },
+    { label: "Deployment", value: "rafael-web" },
     { label: "Replicas", value: currentStatus.replicas },
-    { label: "Service", value: currentStatus.service },
+    { label: "Web Service", value: "rafael-web-service / ClusterIP" },
+    { label: "Ingress", value: "rafa.lab.local / NGINX / HTTP" },
+    { label: "Database", value: "PostgreSQL 16 / StatefulSet rafael-postgres" },
+    { label: "Database Service", value: "rafael-postgres / headless ClusterIP" },
+    { label: "Persistent storage", value: "PVC / 1Gi / ReadWriteOnce" },
+    { label: "Credentials", value: "Kubernetes Secret" },
+    { label: "Database check", value: "ConfigMap + CronJob / every 2 minutes" },
     { label: "CPU request / limit", value: "100m / 500m" },
     { label: "Memory request / limit", value: "128Mi / 256Mi" },
+  ],
+  evidence: [
+    {
+      title: "PostgreSQL connectivity",
+      state: "Validated",
+      summary: "A Job completed pg_isready and SELECT 1 successfully.",
+    },
+    {
+      title: "Persistent user data",
+      state: "Validated",
+      summary: "A registered user retained the same ID and creation date after the PostgreSQL Pod was recreated.",
+    },
+    {
+      title: "Ingress access",
+      state: "Validated",
+      summary: "The application was reached through rafa.lab.local using the local NGINX Ingress port-forward.",
+    },
   ],
   milestones: [
     {
@@ -76,7 +99,7 @@ const labStatus = {
     {
       title: "Kubernetes Task 1",
       state: "Completed",
-      summary: "Deployment, resource controls and LoadBalancer configured in rafa-lab.",
+      summary: "Deployment and resource controls completed; web traffic later evolved to ClusterIP and Ingress.",
     },
     {
       title: "Kubernetes Task 2",
@@ -142,7 +165,7 @@ const sessionStore = new PostgresSessionStore({
 });
 
 // La cookie guarda únicamente un identificador firmado. Los datos de sesión quedan
-// en PostgreSQL y por eso cualquiera de los dos Pods puede atender la siguiente petición.
+// en PostgreSQL y por eso cualquiera de los tres Pods puede atender la siguiente petición.
 app.use(session({
   name: cookieName,
   secret: sessionSecret,

@@ -1,0 +1,22 @@
+# El Ingress publica la aplicación mediante un nombre fácil de recordar en Minikube.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rafael-web
+  namespace: rafa-lab
+spec:
+  # Esta clase indica que las reglas deben ser atendidas por Ingress NGINX.
+  ingressClassName: nginx
+  rules:
+    - host: rafa.lab.local
+      http:
+        paths:
+          # Prefix permite servir la landing, el dashboard, la API y los assets
+          # desde el mismo host sin enumerar cada ruta de Express.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rafael-web-service
+                port:
+                  number: 80

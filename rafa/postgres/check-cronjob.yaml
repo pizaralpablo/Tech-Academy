@@ -1,0 +1,65 @@
+# Este CronJob ejecuta la comprobación de PostgreSQL cada dos minutos.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rafael-postgres-check
+  namespace: rafa-lab
+spec:
+  schedule: "*/2 * * * *"
+
+  # Forbid evita superponer ejecuciones si una comprobación anterior sigue activa.
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: rafael-postgres-check
+        spec:
+          # El chequeo solo usa DNS y PostgreSQL; no necesita consultar la API de Kubernetes.
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          containers:
+            - name: postgres-check
+              # Reutilizamos la imagen ya cargada en Minikube, que contiene pg_isready y psql.
+              image: rafael-postgres:1.0
+              imagePullPolicy: Never
+              command:
+                - /bin/sh
+                - /scripts/check-postgres.sh
+              env:
+                # El CronJob comparte namespace con el Service, por eso su nombre corto
+                # rafael-postgres se resuelve mediante el DNS interno del clúster.
+                - name: PGHOST
+                  value: rafael-postgres
+                - name: PGPORT
+                  value: "5432"
+                - name: PGDATABASE
+                  value: rafa_lab
+                - name: PGUSER
+                  value: postgres
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: rafael-postgres-credentials
+                      key: password
+              resources:
+                requests:
+                  cpu: "25m"
+                  memory: "32Mi"
+                limits:
+                  cpu: "100m"
+                  memory: "128Mi"
+              volumeMounts:
+                - name: check-script
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: check-script
+              configMap:
+                name: rafael-postgres-check
+                # 0555 permite ejecutar el script sin conceder permisos de escritura.
+                defaultMode: 0555
