@@ -15,8 +15,8 @@ metadata:
 # Aquí describimos el estado que queremos que Kubernetes mantenga para este Deployment.
 spec:
 
-  # Queremos mantener dos copias de nuestra aplicación ejecutándose.
-  replicas: 2
+  # Queremos mantener tres copias de nuestra aplicación ejecutándose.
+  replicas: 3
 
   # Le indicamos al Deployment cómo reconocer cuáles Pods le pertenecen.
   # Todo Pod que tenga la etiqueta "app: rafael-web" será parte de este Deployment.
@@ -38,7 +38,7 @@ spec:
 
         # Este será el contenedor que ejecutará nuestra aplicación.
         - name: rafael-web
-          image: rafael-web-node:1.6
+          image: rafael-web-node:1.9
 
           # Le indicamos a Kubernetes que use la imagen que ya cargamos en Minikube.
           # Así evitamos que intente descargar nuestra imagen desde un registro externo.
@@ -95,9 +95,20 @@ spec:
           ports:
             - containerPort: 3000
 
+          # Kubernetes consulta este endpoint público antes de enviar tráfico al Pod.
+          # La prueba confirma que Express responde, pero no reemplaza una prueba de PostgreSQL.
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
 #Quiero un Deployment llamado rafael-web
 #        ↓
-#que mantenga 2 réplicas
+#que mantenga 3 réplicas
 #        ↓
 #que identifique sus Pods con app=rafael-web
 #        ↓
@@ -105,7 +116,7 @@ spec:
 #        ↓
 #Pod
 # └── container: rafael-web
-#      ├── image: rafael-web-node:1.6
+#      ├── image: rafael-web-node:1.9
 #      ├── no buscar la imagen afuera
 #      └── aplicación escucha en :3000
 

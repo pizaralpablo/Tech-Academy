@@ -14,6 +14,7 @@ const connectionText = document.getElementById("connection-text");
 const authenticatedUsername = document.getElementById("authenticated-username");
 const logoutButton = document.getElementById("logout-button");
 const logoutMessage = document.getElementById("logout-message");
+const evidenceList = document.getElementById("evidence-list");
 let csrfToken = null;
 
 function renderMilestones(milestones) {
@@ -75,6 +76,35 @@ function renderDeployment(items) {
   deploymentList.replaceChildren(fragment);
 }
 
+function renderEvidence(items) {
+  if (items.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "empty-state";
+    emptyMessage.textContent = "Recorded evidence unavailable.";
+    evidenceList.replaceChildren(emptyMessage);
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  items.forEach((item) => {
+    const article = document.createElement("article");
+    const state = document.createElement("span");
+    const title = document.createElement("strong");
+    const summary = document.createElement("p");
+
+    article.className = "evidence-item";
+    state.className = "evidence-state";
+    state.textContent = item.state;
+    title.textContent = item.title;
+    summary.textContent = item.summary;
+    article.append(state, title, summary);
+    fragment.append(article);
+  });
+
+  evidenceList.replaceChildren(fragment);
+}
+
 function setSummaryState(text, className = "") {
   summaryStates.forEach((state) => {
     state.textContent = text;
@@ -96,6 +126,7 @@ function renderStatusUnavailable() {
   setSummaryState("API unavailable", "is-error");
   renderMilestones([]);
   renderDeployment([{ label: "Deployment data", value: "No disponible" }]);
+  renderEvidence([]);
   connectionText.textContent = "API unavailable";
   connectionState.classList.add("is-error");
 }
@@ -130,18 +161,20 @@ async function loadLabStatus() {
     ? data.deployment
     : legacyFields.map((field) => ({ label: field, value: data[field] || "No disponible" }));
   const milestones = Array.isArray(data.milestones) ? data.milestones : [];
-  const apiStatus = data.status || "Available";
+  const evidence = Array.isArray(data.evidence) ? data.evidence : [];
 
   namespaceValue.textContent = data.context?.namespace || "No disponible";
-  apiValue.textContent = apiStatus;
-  systemLabel.textContent = apiStatus === "Running" ? "System online" : apiStatus;
+  apiValue.textContent = "Responding";
+  systemLabel.textContent = "Configuration loaded";
   runtimeValue.textContent = data.runtime || "No disponible";
   replicasValue.textContent = data.replicas || "No disponible";
   serviceValue.textContent = data.service || "No disponible";
-  setSummaryState("Reported by API", "is-running");
+  setSummaryState("Declared by API", "is-running");
   renderMilestones(milestones);
   renderDeployment(deploymentItems);
-  connectionText.textContent = apiStatus;
+  renderEvidence(evidence);
+  connectionText.textContent = "API response received";
+  connectionState.classList.remove("is-error");
 }
 
 // Primero confirmamos la sesión y luego cargamos los datos educativos públicos.

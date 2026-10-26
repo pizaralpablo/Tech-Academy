@@ -1,0 +1,35 @@
+# Este ConfigMap guarda el script de comprobación separado de la imagen del CronJob.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rafael-postgres-check
+  namespace: rafa-lab
+data:
+  check-postgres.sh: |
+    #!/bin/sh
+    set -eu
+
+    # La imagen Alpine incluye /bin/sh y las herramientas oficiales de PostgreSQL.
+    # El script también es compatible con Bash, pero no exige instalarlo en la imagen.
+    echo "Comprobando PostgreSQL en ${PGHOST}:${PGPORT}/${PGDATABASE}..."
+
+    # pg_isready verifica primero que el servidor acepte conexiones.
+    pg_isready \
+      --host="${PGHOST}" \
+      --port="${PGPORT}" \
+      --username="${PGUSER}" \
+      --dbname="${PGDATABASE}"
+
+    # SELECT 1 confirma una conexión autenticada y una consulta completa sin leer
+    # usuarios, hashes ni otros datos del laboratorio.
+    psql \
+      --host="${PGHOST}" \
+      --port="${PGPORT}" \
+      --username="${PGUSER}" \
+      --dbname="${PGDATABASE}" \
+      --set=ON_ERROR_STOP=1 \
+      --tuples-only \
+      --no-align \
+      --command="SELECT 1 AS database_available;"
+
+    echo "Comprobación de PostgreSQL completada correctamente."

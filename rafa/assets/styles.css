@@ -312,6 +312,73 @@ a {
   padding-block: 30px 70px;
 }
 
+.architecture-section {
+  padding-block: 38px 30px;
+}
+
+.architecture-flow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgba(83, 200, 218, 0.3);
+  border-radius: 6px;
+  background: rgba(83, 200, 218, 0.3);
+}
+
+.architecture-node {
+  min-width: 0;
+  min-height: 122px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(6, 19, 23, 0.94);
+}
+
+.architecture-node span,
+.architecture-note,
+.recorded-badge,
+.evidence-state {
+  color: var(--cyan);
+  font-family: Consolas, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.architecture-node strong {
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 0.88rem;
+}
+
+.architecture-node small {
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.architecture-note,
+.recorded-badge {
+  padding: 6px 9px;
+  border: 1px solid rgba(83, 200, 218, 0.42);
+  border-radius: 4px;
+}
+
+.lab-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 18px;
+  padding-top: 14px;
+  color: var(--green);
+  font-family: Consolas, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
 .access-panel {
   padding: 28px;
 }
@@ -807,6 +874,40 @@ a {
   font-size: 0.75rem;
 }
 
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.evidence-item {
+  min-width: 0;
+  min-height: 148px;
+  padding: 20px;
+  border: 1px solid rgba(83, 200, 218, 0.3);
+  border-radius: 6px;
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+}
+
+.evidence-state {
+  display: inline-block;
+  padding-bottom: 8px;
+  color: var(--green-strong);
+}
+
+.evidence-item strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.94rem;
+}
+
+.evidence-item p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.79rem;
+}
+
 code {
   color: var(--cyan);
   font-family: Consolas, monospace;
@@ -830,8 +931,13 @@ code {
   }
 
   .feature-grid,
-  .summary-grid {
+  .summary-grid,
+  .evidence-grid {
     grid-template-columns: 1fr;
+  }
+
+  .architecture-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .feature-card {
@@ -958,6 +1064,14 @@ code {
 
   .status-table-head {
     display: none;
+  }
+
+  .architecture-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .architecture-node {
+    min-height: 96px;
   }
 }
 

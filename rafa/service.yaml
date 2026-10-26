@@ -25,6 +25,6 @@ spec:
     - port: 80
       targetPort: 3000
 
-  # Usamos LoadBalancer para exponer nuestro Service fuera del cluster.
-  # En Minikube necesitaremos un mecanismo local para acceder a este LoadBalancer.
-  type: LoadBalancer
+  # ClusterIP mantiene el Service dentro del clúster. El Ingress será el único
+  # punto de entrada HTTP y enviará el tráfico a este puerto estable.
+  type: ClusterIP
