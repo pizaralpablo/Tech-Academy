@@ -1,0 +1,18 @@
+# PersistentVolume estatico (static storage) para la base de datos.
+# Se crea manualmente, antes que el StatefulSet, y queda disponible
+# para que una PVC del mismo storageClassName lo reclame.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jonathan-db-pv-static
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/jonathan-db-static
+    type: DirectoryOrCreate

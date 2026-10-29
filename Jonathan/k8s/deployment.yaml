@@ -33,8 +33,17 @@ spec:
             - name: DB_PORT
               value: "5432"
             - name: DB_USER
-              value: jonathan
+              valueFrom:
+                secretKeyRef:
+                  name: jonathan-db-secret
+                  key: POSTGRES_USER
             - name: DB_PASSWORD
-              value: changeme123
+              valueFrom:
+                secretKeyRef:
+                  name: jonathan-db-secret
+                  key: POSTGRES_PASSWORD
             - name: DB_NAME
-              value: techacademy
+              valueFrom:
+                secretKeyRef:
+                  name: jonathan-db-secret
+                  key: POSTGRES_DB
