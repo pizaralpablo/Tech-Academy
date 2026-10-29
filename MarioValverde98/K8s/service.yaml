@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata: 
+ name: mario-app-service
+spec: 
+ type: ClusterIP
+ selector: 
+  app: mario-web
+ ports: 
+ - port: 80
+   targetPort: 80 
+
+
+
+
+ 
