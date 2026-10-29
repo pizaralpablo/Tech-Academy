@@ -1,0 +1,9 @@
+# StorageClass para aprovisionamiento dinamico (dynamic storage).
+# Cuando una PVC pide esta clase, Kubernetes crea el PV automaticamente.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: jonathan-dinamico
+provisioner: k8s.io/minikube-hostpath
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

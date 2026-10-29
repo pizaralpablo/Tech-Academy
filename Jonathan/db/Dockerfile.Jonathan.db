@@ -1,8 +1,8 @@
 FROM postgres:16-alpine
 
-ENV POSTGRES_USER=jonathan
-ENV POSTGRES_PASSWORD=changeme123
-ENV POSTGRES_DB=techacademy
+# Las credenciales (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB) ya no se
+# hardcodean aqui: se inyectan en tiempo de despliegue mediante el Secret
+# jonathan-db-secret (ver k8s/db-secret.yaml y k8s/db-statefulset.yaml).
 
 COPY init.sql /docker-entrypoint-initdb.d/init.sql
 
