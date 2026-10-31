@@ -13,6 +13,13 @@
   --panel: rgba(8, 22, 27, 0.88);
   --panel-soft: rgba(14, 35, 41, 0.78);
   --header-height: 82px;
+  --lighthouse-color: 190 225 255;
+  --lighthouse-duration: 8.4s;
+  --lighthouse-intensity: 0.075;
+  --lighthouse-angle: -12deg;
+  --lighthouse-beam-width: 68vw;
+  --lighthouse-start-right: -82vw;
+  --lighthouse-travel: -205vw;
 }
 
 * {
@@ -604,6 +611,37 @@ a {
   padding-block: 28px 68px;
 }
 
+/* Un reflector exterior cruza el dashboard sin formar parte del layout ni recibir eventos. */
+.dashboard-main::before {
+  position: fixed;
+  top: -35vh;
+  right: var(--lighthouse-start-right);
+  z-index: 10;
+  width: var(--lighthouse-beam-width);
+  height: 170vh;
+  display: none;
+  content: "";
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(var(--lighthouse-color) / 0.01) 18%,
+    rgb(var(--lighthouse-color) / 0.035) 34%,
+    rgb(var(--lighthouse-color) / var(--lighthouse-intensity)) 49%,
+    rgb(var(--lighthouse-color) / 0.045) 63%,
+    rgb(var(--lighthouse-color) / 0.012) 79%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transform: translate3d(0, -4vh, 0) rotate(var(--lighthouse-angle));
+  transform-origin: center;
+  will-change: transform, opacity;
+  contain: paint;
+}
+
 .public-preview {
   max-width: 100%;
   display: inline-flex;
@@ -1122,6 +1160,13 @@ code {
 }
 
 @media (max-width: 560px) {
+  .dashboard-page {
+    --lighthouse-intensity: 0.045;
+    --lighthouse-beam-width: 105vw;
+    --lighthouse-start-right: -120vw;
+    --lighthouse-travel: -235vw;
+  }
+
   .shell {
     width: calc(100% - 28px);
     max-width: 1180px;
@@ -1265,6 +1310,11 @@ code {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .dashboard-main::before {
+    display: block;
+    animation: lighthouse-sweep var(--lighthouse-duration) linear infinite;
+  }
+
   .signal-dot,
   .signal-square {
     animation: signal-pulse 2.4s ease-in-out infinite;
@@ -1285,4 +1335,30 @@ code {
 @keyframes panel-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lighthouse-sweep {
+  0%,
+  72% {
+    opacity: 0;
+    transform: translate3d(0, -4vh, 0) rotate(var(--lighthouse-angle));
+  }
+
+  76% {
+    opacity: 0.32;
+  }
+
+  83% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 0.58;
+  }
+
+  97%,
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--lighthouse-travel), 20vh, 0) rotate(var(--lighthouse-angle));
+  }
 }
