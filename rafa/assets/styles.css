@@ -379,6 +379,44 @@ a {
   text-transform: uppercase;
 }
 
+.security-layer {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 24px;
+  padding: 18px;
+  border-inline: 1px solid rgba(49, 245, 138, 0.32);
+  border-bottom: 1px solid rgba(49, 245, 138, 0.32);
+  background: rgba(5, 22, 17, 0.74);
+}
+
+.security-layer div {
+  min-width: 0;
+}
+
+.security-layer span,
+.rbac-column-title,
+.rbac-resource span {
+  display: block;
+  color: var(--green-strong);
+  font-family: Consolas, monospace;
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.security-layer strong {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+
+.security-layer p {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .access-panel {
   padding: 28px;
 }
@@ -908,6 +946,119 @@ a {
   font-size: 0.79rem;
 }
 
+.rbac-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-family: Consolas, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.rbac-meta strong {
+  color: var(--cyan);
+}
+
+.rbac-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 30px;
+  padding-block: 22px;
+  border-block: 1px solid rgba(83, 200, 218, 0.24);
+}
+
+.rbac-column {
+  min-width: 0;
+}
+
+.rbac-column + .rbac-column {
+  padding-left: 30px;
+  border-left: 1px solid rgba(83, 200, 218, 0.24);
+}
+
+.rbac-column-title {
+  margin-bottom: 12px;
+  color: var(--cyan);
+}
+
+.rbac-chain {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rbac-resource {
+  min-width: 0;
+  min-height: 140px;
+  padding: 16px;
+  border-top: 2px solid var(--green-strong);
+  background: rgba(6, 19, 23, 0.72);
+}
+
+.rbac-resource strong {
+  display: block;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  font-size: 0.83rem;
+}
+
+.rbac-resource p,
+.rbac-assignment {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.rbac-assignment {
+  padding-left: 10px;
+  border-left: 2px solid var(--cyan);
+}
+
+.permission-table {
+  overflow: hidden;
+  border: 1px solid rgba(83, 200, 218, 0.24);
+  border-radius: 5px;
+}
+
+.permission-row {
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) minmax(90px, 0.8fr) minmax(80px, 0.6fr);
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(83, 200, 218, 0.14);
+  font-size: 0.78rem;
+}
+
+.permission-row:last-child {
+  border-bottom: 0;
+}
+
+.permission-head {
+  color: var(--cyan);
+  background: rgba(20, 45, 52, 0.9);
+  font-family: Consolas, monospace;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.permission-result {
+  font-family: Consolas, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.permission-result.is-allowed {
+  color: var(--green-strong);
+}
+
+.permission-result.is-denied {
+  color: var(--danger);
+}
+
 code {
   color: var(--cyan);
   font-family: Consolas, monospace;
@@ -945,7 +1096,19 @@ code {
   }
 
   .access-grid,
-  .dashboard-hero {
+  .dashboard-hero,
+  .rbac-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rbac-column + .rbac-column {
+    padding-top: 22px;
+    padding-left: 0;
+    border-top: 1px solid rgba(83, 200, 218, 0.24);
+    border-left: 0;
+  }
+
+  .rbac-chain {
     grid-template-columns: 1fr;
   }
 
@@ -1070,8 +1233,34 @@ code {
     grid-template-columns: 1fr;
   }
 
+  .security-layer {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
   .architecture-node {
     min-height: 96px;
+  }
+
+  .permission-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding-block: 12px;
+  }
+
+  .permission-head {
+    display: none;
+  }
+
+  .permission-row [role="cell"]::before {
+    display: block;
+    margin-bottom: 2px;
+    content: attr(data-label);
+    color: var(--cyan);
+    font-family: Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
   }
 }
 
