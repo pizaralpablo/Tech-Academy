@@ -1,0 +1,39 @@
+# Esta ServiceAccount representa la identidad que usaremos para consultar Pods.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rafael-monitor
+  namespace: rafa-lab
+
+---
+
+# Este Role define permisos de solo lectura dentro del namespace rafa-lab.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: rafael-pod-reader
+  namespace: rafa-lab
+rules:
+  # El grupo principal de Kubernetes contiene el recurso Pods.
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+---
+
+# Este RoleBinding entrega el Role de lectura a la ServiceAccount del laboratorio.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rafael-monitor-binding
+  namespace: rafa-lab
+roleRef:
+  # roleRef identifica exactamente el Role que se asignará.
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rafael-pod-reader
+subjects:
+  # El subject es la ServiceAccount que recibirá los permisos dentro de rafa-lab.
+  - kind: ServiceAccount
+    name: rafael-monitor
+    namespace: rafa-lab

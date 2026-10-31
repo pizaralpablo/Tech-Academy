@@ -88,6 +88,17 @@
         <div class="architecture-node"><span>05</span><strong>Stateful Storage</strong><small>StatefulSet + PVC</small></div>
       </div>
 
+      <div class="security-layer">
+        <div>
+          <span>Security Layer // Least Privilege</span>
+          <strong>ServiceAccount + RoleBinding + Role</strong>
+        </div>
+        <p>
+          La identidad <code>rafael-monitor</code> puede leer Pods únicamente en
+          <code>rafa-lab</code> y no está asignada al Deployment de la aplicación.
+        </p>
+      </div>
+
       <div class="lab-evidence" aria-label="Pruebas técnicas completadas">
         <span>Validated // Registration stored in PostgreSQL</span>
         <span>Validated // pg_isready + SELECT 1</span>

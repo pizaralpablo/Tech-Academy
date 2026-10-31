@@ -124,6 +124,57 @@
       </p>
     </section>
 
+    <section class="dashboard-section" aria-labelledby="rbac-title">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Identity &amp; Access Control</p>
+          <h2 id="rbac-title">ServiceAccount &amp; RBAC</h2>
+          <p>Relación declarada y resultados registrados durante las pruebas de autorización.</p>
+        </div>
+        <span class="recorded-badge" id="rbac-source">LOADING RECORD</span>
+      </div>
+
+      <div class="rbac-meta">
+        <span>Namespace</span>
+        <strong id="rbac-namespace">Consultando...</strong>
+      </div>
+
+      <div class="rbac-layout">
+        <div class="rbac-column">
+          <p class="rbac-column-title">Binding path</p>
+          <div class="rbac-chain" id="rbac-chain" aria-live="polite">
+            <p class="empty-state">Cargando relación RBAC...</p>
+          </div>
+          <p class="rbac-assignment" id="rbac-assignment"></p>
+        </div>
+
+        <div class="rbac-column">
+          <p class="rbac-column-title">Recorded authorization tests</p>
+          <div class="permission-table" role="table" aria-label="Pruebas registradas de autorización RBAC">
+            <div role="rowgroup">
+              <div class="permission-row permission-head" role="row">
+                <span role="columnheader">Action</span>
+                <span role="columnheader">Scope</span>
+                <span role="columnheader">Result</span>
+              </div>
+            </div>
+            <div id="permission-list" role="rowgroup" aria-live="polite">
+              <div class="permission-row" role="row">
+                <span role="cell" data-label="Action">Authorization data</span>
+                <span role="cell" data-label="Scope">Loading...</span>
+                <strong role="cell" data-label="Result">Pending</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="data-limitation">
+        Esta matriz documenta resultados obtenidos con <code>kubectl auth can-i</code>.
+        No vuelve a consultar la API de Kubernetes ni representa permisos evaluados en tiempo real.
+      </p>
+    </section>
+
     <section class="dashboard-section" aria-labelledby="evidence-title">
       <div class="section-heading">
         <div>
