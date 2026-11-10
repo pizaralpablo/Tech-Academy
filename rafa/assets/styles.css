@@ -13,6 +13,13 @@
   --panel: rgba(8, 22, 27, 0.88);
   --panel-soft: rgba(14, 35, 41, 0.78);
   --header-height: 82px;
+  --lighthouse-color: 190 225 255;
+  --lighthouse-duration: 8.4s;
+  --lighthouse-intensity: 0.075;
+  --lighthouse-angle: -12deg;
+  --lighthouse-beam-width: 68vw;
+  --lighthouse-start-right: -82vw;
+  --lighthouse-travel: -205vw;
 }
 
 * {
@@ -379,6 +386,44 @@ a {
   text-transform: uppercase;
 }
 
+.security-layer {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 24px;
+  padding: 18px;
+  border-inline: 1px solid rgba(49, 245, 138, 0.32);
+  border-bottom: 1px solid rgba(49, 245, 138, 0.32);
+  background: rgba(5, 22, 17, 0.74);
+}
+
+.security-layer div {
+  min-width: 0;
+}
+
+.security-layer span,
+.rbac-column-title,
+.rbac-resource span {
+  display: block;
+  color: var(--green-strong);
+  font-family: Consolas, monospace;
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.security-layer strong {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+
+.security-layer p {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .access-panel {
   padding: 28px;
 }
@@ -564,6 +609,37 @@ a {
 /* El dashboard conserva el lenguaje visual, pero organiza datos reales de la API. */
 .dashboard-main {
   padding-block: 28px 68px;
+}
+
+/* Un reflector exterior cruza el dashboard sin formar parte del layout ni recibir eventos. */
+.dashboard-main::before {
+  position: fixed;
+  top: -35vh;
+  right: var(--lighthouse-start-right);
+  z-index: 10;
+  width: var(--lighthouse-beam-width);
+  height: 170vh;
+  display: none;
+  content: "";
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(var(--lighthouse-color) / 0.01) 18%,
+    rgb(var(--lighthouse-color) / 0.035) 34%,
+    rgb(var(--lighthouse-color) / var(--lighthouse-intensity)) 49%,
+    rgb(var(--lighthouse-color) / 0.045) 63%,
+    rgb(var(--lighthouse-color) / 0.012) 79%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transform: translate3d(0, -4vh, 0) rotate(var(--lighthouse-angle));
+  transform-origin: center;
+  will-change: transform, opacity;
+  contain: paint;
 }
 
 .public-preview {
@@ -908,6 +984,119 @@ a {
   font-size: 0.79rem;
 }
 
+.rbac-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-family: Consolas, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.rbac-meta strong {
+  color: var(--cyan);
+}
+
+.rbac-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 30px;
+  padding-block: 22px;
+  border-block: 1px solid rgba(83, 200, 218, 0.24);
+}
+
+.rbac-column {
+  min-width: 0;
+}
+
+.rbac-column + .rbac-column {
+  padding-left: 30px;
+  border-left: 1px solid rgba(83, 200, 218, 0.24);
+}
+
+.rbac-column-title {
+  margin-bottom: 12px;
+  color: var(--cyan);
+}
+
+.rbac-chain {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rbac-resource {
+  min-width: 0;
+  min-height: 140px;
+  padding: 16px;
+  border-top: 2px solid var(--green-strong);
+  background: rgba(6, 19, 23, 0.72);
+}
+
+.rbac-resource strong {
+  display: block;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  font-size: 0.83rem;
+}
+
+.rbac-resource p,
+.rbac-assignment {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.rbac-assignment {
+  padding-left: 10px;
+  border-left: 2px solid var(--cyan);
+}
+
+.permission-table {
+  overflow: hidden;
+  border: 1px solid rgba(83, 200, 218, 0.24);
+  border-radius: 5px;
+}
+
+.permission-row {
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) minmax(90px, 0.8fr) minmax(80px, 0.6fr);
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(83, 200, 218, 0.14);
+  font-size: 0.78rem;
+}
+
+.permission-row:last-child {
+  border-bottom: 0;
+}
+
+.permission-head {
+  color: var(--cyan);
+  background: rgba(20, 45, 52, 0.9);
+  font-family: Consolas, monospace;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+}
+
+.permission-result {
+  font-family: Consolas, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.permission-result.is-allowed {
+  color: var(--green-strong);
+}
+
+.permission-result.is-denied {
+  color: var(--danger);
+}
+
 code {
   color: var(--cyan);
   font-family: Consolas, monospace;
@@ -945,7 +1134,19 @@ code {
   }
 
   .access-grid,
-  .dashboard-hero {
+  .dashboard-hero,
+  .rbac-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rbac-column + .rbac-column {
+    padding-top: 22px;
+    padding-left: 0;
+    border-top: 1px solid rgba(83, 200, 218, 0.24);
+    border-left: 0;
+  }
+
+  .rbac-chain {
     grid-template-columns: 1fr;
   }
 
@@ -959,6 +1160,13 @@ code {
 }
 
 @media (max-width: 560px) {
+  .dashboard-page {
+    --lighthouse-intensity: 0.045;
+    --lighthouse-beam-width: 105vw;
+    --lighthouse-start-right: -120vw;
+    --lighthouse-travel: -235vw;
+  }
+
   .shell {
     width: calc(100% - 28px);
     max-width: 1180px;
@@ -1070,12 +1278,43 @@ code {
     grid-template-columns: 1fr;
   }
 
+  .security-layer {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
   .architecture-node {
     min-height: 96px;
+  }
+
+  .permission-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding-block: 12px;
+  }
+
+  .permission-head {
+    display: none;
+  }
+
+  .permission-row [role="cell"]::before {
+    display: block;
+    margin-bottom: 2px;
+    content: attr(data-label);
+    color: var(--cyan);
+    font-family: Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .dashboard-main::before {
+    display: block;
+    animation: lighthouse-sweep var(--lighthouse-duration) linear infinite;
+  }
+
   .signal-dot,
   .signal-square {
     animation: signal-pulse 2.4s ease-in-out infinite;
@@ -1096,4 +1335,30 @@ code {
 @keyframes panel-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lighthouse-sweep {
+  0%,
+  72% {
+    opacity: 0;
+    transform: translate3d(0, -4vh, 0) rotate(var(--lighthouse-angle));
+  }
+
+  76% {
+    opacity: 0.32;
+  }
+
+  83% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 0.58;
+  }
+
+  97%,
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--lighthouse-travel), 20vh, 0) rotate(var(--lighthouse-angle));
+  }
 }

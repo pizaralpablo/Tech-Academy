@@ -90,6 +90,34 @@ const labStatus = {
       summary: "The application was reached through rafa.lab.local using the local NGINX Ingress port-forward.",
     },
   ],
+  accessControl: {
+    source: "Recorded authorization validation",
+    namespace: "rafa-lab",
+    assignment: "This dedicated identity is not assigned to the rafael-web Deployment.",
+    resources: [
+      {
+        kind: "ServiceAccount",
+        name: "rafael-monitor",
+        summary: "Namespaced identity used for the authorization exercise.",
+      },
+      {
+        kind: "RoleBinding",
+        name: "rafael-monitor-binding",
+        summary: "Connects the ServiceAccount to the pod-reader Role.",
+      },
+      {
+        kind: "Role",
+        name: "rafael-pod-reader",
+        summary: "Allows get, list and watch only for Pods in rafa-lab.",
+      },
+    ],
+    checks: [
+      { action: "List Pods", scope: "rafa-lab", result: "Allowed" },
+      { action: "Delete Pods", scope: "rafa-lab", result: "Denied" },
+      { action: "List Secrets", scope: "rafa-lab", result: "Denied" },
+      { action: "List Pods", scope: "default", result: "Denied" },
+    ],
+  },
   milestones: [
     {
       title: "Docker Lab",
@@ -110,6 +138,11 @@ const labStatus = {
       title: "Kubernetes Task 3",
       state: "Completed",
       summary: "Static and dynamic persistent storage using PersistentVolumes, PersistentVolumeClaims and StorageClasses.",
+    },
+    {
+      title: "Kubernetes RBAC Lab",
+      state: "Completed",
+      summary: "Namespaced ServiceAccount, Role and RoleBinding validated with least-privilege authorization checks.",
     },
   ],
 };

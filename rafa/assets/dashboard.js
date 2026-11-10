@@ -15,6 +15,11 @@ const authenticatedUsername = document.getElementById("authenticated-username");
 const logoutButton = document.getElementById("logout-button");
 const logoutMessage = document.getElementById("logout-message");
 const evidenceList = document.getElementById("evidence-list");
+const rbacSource = document.getElementById("rbac-source");
+const rbacNamespace = document.getElementById("rbac-namespace");
+const rbacChain = document.getElementById("rbac-chain");
+const rbacAssignment = document.getElementById("rbac-assignment");
+const permissionList = document.getElementById("permission-list");
 let csrfToken = null;
 
 function renderMilestones(milestones) {
@@ -105,6 +110,75 @@ function renderEvidence(items) {
   evidenceList.replaceChildren(fragment);
 }
 
+function renderAccessControl(accessControl = {}) {
+  const resources = Array.isArray(accessControl.resources) ? accessControl.resources : [];
+  const checks = Array.isArray(accessControl.checks) ? accessControl.checks : [];
+
+  rbacSource.textContent = accessControl.source || "Recorded validation unavailable";
+  rbacNamespace.textContent = accessControl.namespace || "No disponible";
+  rbacAssignment.textContent = accessControl.assignment || "Assignment information unavailable.";
+
+  if (resources.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "empty-state";
+    emptyMessage.textContent = "RBAC relationship unavailable.";
+    rbacChain.replaceChildren(emptyMessage);
+  } else {
+    const resourceFragment = document.createDocumentFragment();
+
+    resources.forEach((resource) => {
+      const article = document.createElement("article");
+      const kind = document.createElement("span");
+      const name = document.createElement("strong");
+      const summary = document.createElement("p");
+
+      article.className = "rbac-resource";
+      kind.textContent = resource.kind;
+      name.textContent = resource.name;
+      summary.textContent = resource.summary;
+      article.append(kind, name, summary);
+      resourceFragment.append(article);
+    });
+
+    rbacChain.replaceChildren(resourceFragment);
+  }
+
+  if (checks.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "empty-state";
+    emptyMessage.textContent = "Authorization checks unavailable.";
+    permissionList.replaceChildren(emptyMessage);
+    return;
+  }
+
+  const checkFragment = document.createDocumentFragment();
+
+  checks.forEach((check) => {
+    const row = document.createElement("div");
+    const action = document.createElement("span");
+    const scope = document.createElement("span");
+    const result = document.createElement("strong");
+    const isAllowed = check.result === "Allowed";
+
+    row.className = "permission-row";
+    row.setAttribute("role", "row");
+    action.setAttribute("role", "cell");
+    scope.setAttribute("role", "cell");
+    result.setAttribute("role", "cell");
+    action.dataset.label = "Action";
+    scope.dataset.label = "Scope";
+    result.dataset.label = "Result";
+    result.className = `permission-result ${isAllowed ? "is-allowed" : "is-denied"}`;
+    action.textContent = check.action;
+    scope.textContent = check.scope;
+    result.textContent = check.result;
+    row.append(action, scope, result);
+    checkFragment.append(row);
+  });
+
+  permissionList.replaceChildren(checkFragment);
+}
+
 function setSummaryState(text, className = "") {
   summaryStates.forEach((state) => {
     state.textContent = text;
@@ -127,6 +201,7 @@ function renderStatusUnavailable() {
   renderMilestones([]);
   renderDeployment([{ label: "Deployment data", value: "No disponible" }]);
   renderEvidence([]);
+  renderAccessControl();
   connectionText.textContent = "API unavailable";
   connectionState.classList.add("is-error");
 }
@@ -173,6 +248,7 @@ async function loadLabStatus() {
   renderMilestones(milestones);
   renderDeployment(deploymentItems);
   renderEvidence(evidence);
+  renderAccessControl(data.accessControl);
   connectionText.textContent = "API response received";
   connectionState.classList.remove("is-error");
 }
