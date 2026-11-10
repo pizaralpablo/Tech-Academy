@@ -1,0 +1,14 @@
+# PersistentVolumeClaim que reclama especificamente el PV estatico
+# declarado en db-pv-static.yaml.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jonathan-db-pvc-static
+spec:
+  volumeName: jonathan-db-pv-static
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual

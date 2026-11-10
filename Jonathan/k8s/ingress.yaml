@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jonathan-web-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: jonathan.k8s-lab.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jonathan-web-service
+                port:
+                  number: 80

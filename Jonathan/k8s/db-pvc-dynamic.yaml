@@ -1,0 +1,13 @@
+# PersistentVolumeClaim dinamica: no reclama un PV existente,
+# sino que pide a la StorageClass que aprovisione uno automaticamente.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jonathan-db-pvc-dynamic
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: jonathan-dinamico
+  resources:
+    requests:
+      storage: 1Gi
