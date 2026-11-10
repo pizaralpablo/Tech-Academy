@@ -1,0 +1,305 @@
+EXAMEN DE KUBERNETES — 50 PREGUNTAS
+Nivel: básico a intermedio
+Selección única: una respuesta correcta por pregunta.
+Tiempo sugerido: 20 segundos para conceptos y 30–45 segundos para escenarios.
+
+
+1. ¿Qué caracteriza a un Service de tipo NodePort?
+A. Solo permite tráfico entre contenedores del mismo Pod
+B. Crea un dominio público automáticamente
+C. Almacena la IP de cada usuario
+D. Expone el Service mediante un puerto en los nodos
+
+2. Una aplicación está bloqueada y reiniciarla permite recuperarla. ¿Qué probe ayuda a detectar este caso?
+A. readinessProbe
+B. livenessProbe
+C. volumeProbe
+D. ingressProbe
+
+3. ¿Qué hace un Horizontal Pod Autoscaler o HPA?
+A. Aumenta automáticamente el tamaño de los discos
+B. Ajusta la cantidad de réplicas según métricas configuradas
+C. Aumenta la memoria de cada contenedor obligatoriamente
+D. Actualiza las imágenes de las aplicaciones
+
+4. ¿Para qué se utiliza principalmente un Ingress?
+A. Para dirigir tráfico HTTP/HTTPS según dominios y rutas
+B. Para asignar almacenamiento a los Pods
+C. Para reiniciar contenedores bloqueados
+D. Para definir permisos de usuarios
+
+5. ¿Cuál es la unidad mínima que Kubernetes despliega y administra?
+A. Deployment
+B. Namespace
+C. Pod
+D. Node
+
+6. ¿Para qué sirve un ClusterRoleBinding?
+A. Para otorgar los permisos de un ClusterRole a nivel del clúster
+B. Para montar un volumen en todos los nodos
+C. Para publicar una aplicación en Internet
+D. Para copiar un Role entre contenedores
+
+7. En un Service con selector, ¿cómo se identifican sus Pods de destino?
+A. Por su consumo de memoria
+B. Por sus labels
+C. Por el tamaño de su imagen
+D. Por su fecha de creación
+
+8. ¿Qué representa un PersistentVolumeClaim o PVC?
+A. Una imagen con archivos incluidos
+B. Una política de reinicio
+C. Una contraseña para acceder al disco
+D. Una solicitud de almacenamiento de una aplicación
+
+9. En un Deployment, ¿qué ocurre si la livenessProbe alcanza el umbral de fallos?
+A. Se aumenta la cantidad de réplicas
+B. Se elimina el Service
+C. Se reinicia el contenedor afectado
+D. Se amplía el volumen
+
+10. ¿Cómo utiliza normalmente un Pod el almacenamiento de un PV?
+A. Mediante un RoleBinding
+B. Referenciando un PVC en su configuración de volúmenes
+C. Mediante un Ingress
+D. Agregando el nombre del disco a un label
+
+11. ¿Qué recurso usarías para ejecutar un agente de logs en cada nodo elegible?
+A. Job
+B. Deployment
+C. DaemonSet
+D. StatefulSet
+
+12. En un Deployment, ¿qué puede pasar si un contenedor supera su límite de memoria?
+A. El contenedor termina por falta de memoria y se reinicia
+B. Su límite de memoria aumenta automáticamente
+C. Se reinician todos los nodos
+D. Su consumo adicional se guarda en un PVC
+
+13. ¿Para qué sirve una StorageClass?
+A. Para clasificar imágenes por tamaño
+B. Para asignar permisos sobre archivos
+C. Para definir una clase de almacenamiento y cómo aprovisionarla
+D. Para definir la cantidad de réplicas
+
+14. Un HPA tiene mínimo 2 y máximo 6 réplicas. Si la carga requiere más capacidad, ¿qué puede hacer?
+A. Crear réplicas sin límite
+B. Aumentar automáticamente la cantidad de nodos
+C. Aumentar las réplicas hasta un máximo de 6
+D. Cambiar el límite de memoria de todos los contenedores
+
+15. ¿Qué representa un request de CPU o memoria de un contenedor?
+A. El máximo absoluto que puede consumir
+B. La cantidad de recursos que solicita para ejecutarse
+C. La cantidad de réplicas que necesita
+D. El tiempo máximo que puede permanecer activo
+
+16. ¿Para qué sirve un RoleBinding?
+A. Para conectar un PVC con un PV
+B. Para asociar un Service con un Deployment
+C. Para otorgar permisos de un Role o ClusterRole dentro de un namespace
+D. Para unir dos nodos del clúster
+
+17. ¿Qué es el aprovisionamiento dinámico de almacenamiento?
+A. Copiar archivos entre contenedores automáticamente
+B. Convertir memoria RAM en un disco permanente
+C. Crear manualmente un PV para cada aplicación
+D. Crear almacenamiento bajo demanda mediante un PVC y una StorageClass compatible
+
+18. ¿Qué caracteriza a un StatefulSet?
+A. Publica automáticamente una aplicación en Internet
+B. Mantiene una identidad estable para cada Pod
+C. Ejecuta únicamente aplicaciones sin almacenamiento
+D. Impide reiniciar sus contenedores
+
+19. ¿Para qué se utiliza RBAC en Kubernetes?
+A. Para controlar quién puede realizar acciones sobre recursos
+B. Para balancear tráfico entre Pods
+C. Para ampliar volúmenes automáticamente
+D. Para verificar la salud de los contenedores
+
+20. ¿Qué representa un nodo en Kubernetes?
+A. Una versión de una aplicación
+B. Una regla de acceso
+C. Una imagen de contenedor
+D. Una máquina física o virtual del clúster
+
+21. ¿Para qué se utiliza un Service de tipo LoadBalancer?
+A. Para distribuir archivos entre volúmenes
+B. Para exponer una aplicación mediante un balanceador externo compatible
+C. Para repartir memoria entre contenedores
+D. Para crear réplicas automáticamente
+
+22. ¿Qué representa un PersistentVolume o PV?
+A. Un recurso que representa almacenamiento disponible en el clúster
+B. Una solicitud de memoria RAM
+C. Una copia de un Deployment
+D. Una regla de acceso a un namespace
+
+23. ¿Qué ocurre normalmente cuando falla la readinessProbe?
+A. El contenedor se reinicia inmediatamente
+B. El Pod deja de considerarse listo para recibir tráfico de un Service
+C. El Deployment se elimina
+D. El nodo se apaga
+
+24. ¿Qué puede ocurrir al eliminar un PVC asociado a un PV con política Retain?
+A. El almacenamiento se elimina obligatoriamente
+B. El almacenamiento se conserva para su gestión o recuperación manual
+C. Los datos se copian automáticamente a un Secret
+D. Se crea un Deployment de respaldo
+
+25. ¿Qué evalúa una readinessProbe?
+A. Si la imagen tiene una nueva versión
+B. Si el volumen necesita más espacio
+C. Si el usuario tiene permisos
+D. Si el contenedor está preparado para atender tráfico
+
+26. ¿Qué recurso administra réplicas y actualizaciones de una aplicación sin estado?
+A. Secret
+B. Deployment
+C. ConfigMap
+D. PersistentVolume
+
+27. ¿De dónde puede provenir el almacenamiento persistente de Kubernetes?
+A. Únicamente de la memoria RAM del contenedor
+B. Únicamente de la imagen de la aplicación
+C. De servicios de nube o de infraestructura local
+D. Únicamente de un Secret
+
+28. Un usuario solo necesita consultar Pods en desarrollo. ¿Qué permisos conviene darle?
+A. Administración completa del clúster
+B. Permiso para eliminar namespaces
+C. Acceso de escritura a todos los Secrets
+D. Un Role de lectura de Pods y un RoleBinding en desarrollo
+
+29. Una aplicación tarda varios minutos en arrancar. ¿Qué probe permite darle tiempo de inicio?
+A. networkProbe
+B. storageProbe
+C. serviceProbe
+D. startupProbe
+
+30. Un Deployment tiene tres réplicas. Eliminás un Pod. ¿Qué ocurre normalmente?
+A. El Deployment cambia a dos réplicas
+B. Se eliminan las otras réplicas
+C. Se crea un Pod para volver a tener tres réplicas
+D. Se detiene la aplicación hasta una intervención manual
+
+31. ¿Para qué sirve un Service de tipo ClusterIP?
+A. Para acceder a una aplicación mediante una IP interna del clúster
+B. Para asignar una IP pública a cada contenedor
+C. Para almacenar archivos compartidos
+D. Para reemplazar los Pods
+
+32. ¿Cuál es la función principal de Kubernetes?
+A. Compilar código fuente
+B. Orquestar aplicaciones en contenedores
+C. Construir imágenes de contenedores
+D. Administrar repositorios Git
+
+33. ¿Qué modo permite montar un volumen en lectura y escritura desde varios nodos, si el almacenamiento lo soporta?
+A. ReadWriteMany — RWX
+B. ReadOnlyMany — ROX
+C. ReadWriteOnce — RWO
+D. ReadWriteOncePod — RWOP
+
+34. ¿Para qué sirve un Namespace?
+A. Para agrupar y dar ámbito a recursos del clúster
+B. Para aumentar la capacidad de los nodos
+C. Para construir imágenes
+D. Para guardar copias de seguridad
+
+35. ¿Qué caracteriza a un ClusterRole?
+A. Solo permite administrar un contenedor
+B. Define permisos sin pertenecer a un namespace
+C. Solo permite consultar Services
+D. Otorga permisos automáticamente a todos los usuarios
+
+36. ¿Qué recurso usarías para guardar configuración no confidencial?
+A. PersistentVolume
+B. RoleBinding
+C. ConfigMap
+D. ClusterRole
+
+37. ¿Para qué se utilizan los labels?
+A. Para cifrar contraseñas
+B. Para definir el tamaño de los volúmenes
+C. Para limitar el consumo de CPU
+D. Para identificar y seleccionar recursos
+
+38. Un Pod se elimina y otro monta su mismo PVC, que sigue disponible. ¿Qué ocurre con los datos persistidos?
+A. Se eliminan al cambiar el nombre del Pod
+B. Permanecen disponibles en el volumen
+C. Se convierten en un ConfigMap
+D. Solo existen en los logs del Pod anterior
+
+39. ¿Qué puede ocurrir si un contenedor intenta superar su límite de CPU?
+A. Su Service se elimina
+B. Su memoria aumenta automáticamente
+C. Se restringe su tiempo de CPU mediante throttling
+D. Su volumen cambia a solo lectura
+
+40. ¿Cuál es el propósito de una NetworkPolicy?
+A. Administrar certificados TLS
+B. Crear discos para los Pods
+C. Controlar el tráfico de red permitido hacia o desde Pods
+D. Asignar permisos para consultar la API
+
+41. ¿Qué es el aprovisionamiento estático de almacenamiento?
+A. Crear previamente un PV para que pueda utilizarlo un PVC compatible
+B. Crear automáticamente un disco por cada reinicio
+C. Guardar los datos en la imagen del contenedor
+D. Aumentar el almacenamiento según el consumo de CPU
+
+42. ¿Qué permite definir un Role?
+A. Rutas HTTP para una aplicación
+B. Límites de almacenamiento para un nodo
+C. Reglas de comunicación entre Pods
+D. Permisos sobre recursos dentro de un namespace
+
+43. ¿Qué significa ReadWriteOnce o RWO?
+A. Que solo permite leer el volumen una vez
+B. Que solo permite almacenar un archivo
+C. Que permite montar el volumen en lectura y escritura desde un solo nodo a la vez
+D. Que permite escribir desde todos los nodos simultáneamente
+
+44. ¿Qué recurso está diseñado para almacenar datos como contraseñas o tokens?
+A. Secret
+B. Service
+C. Namespace
+D. Deployment
+
+45. ¿Para qué sirve un Service en Kubernetes?
+A. Para guardar contraseñas
+B. Para crear imágenes de contenedores
+C. Para definir permisos de usuarios
+D. Para ofrecer un punto de acceso estable a una aplicación
+
+46. ¿Qué describe mejor el almacenamiento compartido de archivos, como NFS?
+A. Una contraseña compartida entre aplicaciones
+B. Un límite de memoria para varios Pods
+C. Un disco local exclusivo de un contenedor
+D. Un sistema de archivos accesible por red desde varios clientes
+
+47. ¿Qué significa que el valor de un Secret esté codificado en Base64?
+A. Que está cifrado con una clave privada
+B. Que solo puede leerlo el administrador
+C. Que desaparece después de utilizarse
+D. Que está codificado; eso por sí solo no lo cifra
+
+48. ¿Cuántos contenedores puede tener un Pod?
+A. Uno o más contenedores
+B. Exactamente dos contenedores
+C. Únicamente un contenedor
+D. Ninguno; los contenedores pertenecen al Service
+
+49. ¿Readiness y liveness necesitan estar configuradas juntas para funcionar?
+A. No, cada una cumple una función independiente
+B. Sí, readiness activa liveness
+C. Sí, Kubernetes rechaza un Pod con solo una
+D. No, porque ambas hacen exactamente lo mismo
+
+50. Un Deployment pasa de 2 a 4 réplicas. ¿Qué significa?
+A. Cada contenedor recibe el doble de memoria
+B. Se crean cuatro nodos nuevos
+C. La cantidad deseada de Pods pasa de 2 a 4
+D. Se duplica el tamaño del almacenamiento
