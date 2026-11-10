@@ -1,0 +1,11 @@
+apiVersion: v1                     # Versión de la API base para servicios
+kind: Service                      # Objeto de red Service
+metadata:
+  name: mario-db-service           # Nombre del servicio (coincide con serviceName del StatefulSet)
+spec:
+  type: ClusterIP                  # Requerimiento 3: IP interna privada, no accesible desde internet
+  selector:
+    app: mario-db                  # MATCH: Enlaza directamente con los Pods con label 'app: mario-db'
+  ports:
+  - port: 3306                     # Puerto accesible dentro del clúster
+    targetPort: 3306               # Puerto del contenedor donde corre MySQL

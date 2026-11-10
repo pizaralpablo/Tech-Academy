@@ -1,0 +1,48 @@
+apiVersion: apps/v1                # Versión de la API para StatefulSets
+kind: StatefulSet                  # Tipo de controlador: StatefulSet (ideal para bases de datos)
+metadata:
+  name: mario-db-statefulset       # Nombre del objeto StatefulSet
+spec:
+  serviceName: mario-db-service    # Servicio Headless/ClusterIP que administra la red de estos Pods
+  replicas: 1                      # 1 instancia de base de datos para evitar conflictos de escritura
+  selector:
+    matchLabels:
+      app: mario-db                # Selecciona Pods que tengan la etiqueta 'app: mario-db'
+  template:
+    metadata:
+      labels:
+        app: mario-db              # Etiqueta asignada al Pod de base de datos
+    spec:
+      containers:
+        - name: mario-db-container
+          image: mario-db:v1
+          ports:
+            - containerPort: 3306
+          env:                       # Variables de entorno requeridas por el contenedor MySQL
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariodb-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mariodb-secret
+                  key: mysql-database
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: mysql-app-username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariadb-secret
+                  key: mysql-app-password
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+          - name: mysql-persistent-storage
+            persistentVolumeClaim:
+              claimName: mario-pvc-dinamico
