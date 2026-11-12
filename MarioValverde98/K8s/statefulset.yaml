@@ -2,6 +2,7 @@ apiVersion: apps/v1                # Versión de la API para StatefulSets
 kind: StatefulSet                  # Tipo de controlador: StatefulSet (ideal para bases de datos)
 metadata:
   name: mario-db-statefulset       # Nombre del objeto StatefulSet
+  namespace: mario
 spec:
   serviceName: mario-db-service    # Servicio Headless/ClusterIP que administra la red de estos Pods
   replicas: 1                      # 1 instancia de base de datos para evitar conflictos de escritura
