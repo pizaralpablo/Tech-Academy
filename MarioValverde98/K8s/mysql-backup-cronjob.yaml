@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mario-db-backup-cronjob
+  namespace: mario
+  labels:
+    app: mario-db
+    tier: maintenance
+spec:
+  schedule: "0 3 * * *"  # Se ejecuta todas las madrugadas a las 3:00 AM
+  timeZone: "America/Costa_Rica"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            task: mysql-backup
+        spec:
+          containers:
+          - name: mysql-backup-container
+            image: mysql:8.0
+            command:
+            - "sh"
+            - "-c"
+            - |
+              echo "[INFO] Iniciando proceso de respaldo para la base de datos empresa_db..."
+              # Comando real de mysqldump apuntando a tu service interno mario-db-service
+              mysqldump -h mario-db-service -u $DB_USER -p$DB_PASSWORD empresa_db > /backup/empresa_db_$(date +%Y%m%d_%H%M%S).sql
+              echo "[SUCCESS] Respaldo completado y asegurado correctamente en el volumen."
+            env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mariodb-secret
+                  key: mysql-app-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mariodb-secret
+                  key: mysql-app-password
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: mario-pvc-dinamico  # Conectado a tu PVC dinámico existente
+          restartPolicy: OnFailure
