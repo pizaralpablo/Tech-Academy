@@ -2,6 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mario-pvc-estatico
+  namespace: mario
 spec:
   accessModes:
     - ReadWriteOnce

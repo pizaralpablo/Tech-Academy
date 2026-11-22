@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mario-app-deployment
+  namespace: mario
 spec: 
   replicas: 2 
   selector:
@@ -45,5 +46,4 @@ spec:
             memory: 256Mi 
             
         
-
 
